@@ -1,16 +1,138 @@
 ---
-
+import "../styles/style.css";
+import Gallery3D from "../components/Gallery3D.astro";
+import ArchiveTable from "../components/ArchiveTable.astro";
 ---
 
-<html lang="en">
+<html lang="it">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<title>Pixar Viz</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<div id="custom-cursor"></div>
+		<button id="toggle-view" class="toggle-btn">TABLE VIEW</button>
+
+		<div id="gallery-view" class="view active">
+			<Gallery3D />
+		</div>
+
+		<div id="archive-view" class="view">
+			<ArchiveTable />
+		</div>
+
+		<script>
+			// Custom cursor
+			const cursor = document.getElementById("custom-cursor");
+			let is3DHovering = false;
+
+			// Listen for 3D hover events from Gallery3D
+			window.addEventListener("3d-hover", ((e: CustomEvent) => {
+				is3DHovering = e.detail.isHovering;
+			}) as EventListener);
+
+			document.addEventListener("mousemove", e => {
+				if (!cursor) return;
+
+				cursor.style.left = e.clientX + "px";
+				cursor.style.top = e.clientY + "px";
+
+				// Get element under cursor (cursor has pointer-events: none so it's ignored)
+				const elementUnderCursor = document.elementFromPoint(
+					e.clientX,
+					e.clientY
+				);
+
+				// Check if it's an interactive element
+				let isInteractive = false;
+
+				if (elementUnderCursor && elementUnderCursor !== cursor) {
+					isInteractive =
+						elementUnderCursor.tagName === "BUTTON" ||
+						elementUnderCursor.tagName === "A" ||
+						elementUnderCursor.tagName === "INPUT" ||
+						elementUnderCursor.tagName === "SELECT" ||
+						elementUnderCursor.tagName === "TEXTAREA" ||
+						!!elementUnderCursor.closest("button, a, input, select, textarea");
+				}
+
+				// Also consider 3D hover state
+				if (isInteractive || is3DHovering) {
+					cursor.classList.add("hover");
+				} else {
+					cursor.classList.remove("hover");
+				}
+			});
+
+			// Toggle view logic
+			const toggleBtn = document.getElementById("toggle-view");
+			const galleryView = document.getElementById("gallery-view");
+			const archiveView = document.getElementById("archive-view");
+			let isGallery = true;
+
+			toggleBtn?.addEventListener("click", () => {
+				isGallery = !isGallery;
+
+				if (isGallery) {
+					galleryView?.classList.add("active");
+					archiveView?.classList.remove("active");
+					if (toggleBtn) toggleBtn.textContent = "TABLE VIEW";
+				} else {
+					galleryView?.classList.remove("active");
+					archiveView?.classList.add("active");
+					if (toggleBtn) toggleBtn.textContent = "3D VIEW";
+				}
+			});
+		</script>
+
+		<style>
+			.toggle-btn {
+				position: fixed;
+				top: 2rem;
+				right: 2rem;
+				padding: 0;
+				background: transparent;
+				color: #000000;
+				border: none;
+				font-weight: 900;
+				font-size: 1.2rem;
+				text-transform: uppercase;
+				letter-spacing: 0.15em;
+				cursor: pointer;
+				z-index: 1000;
+				font-family:
+					"Inter",
+					-apple-system,
+					BlinkMacSystemFont,
+					"Segoe UI",
+					"Roboto",
+					"Helvetica Neue",
+					Arial,
+					sans-serif;
+				transition: none;
+			}
+
+			.toggle-btn:hover {
+				/* text-decoration: underline;
+				text-decoration-thickness: 4px; */
+			}
+
+			.view {
+				display: none;
+			}
+
+			.view.active {
+				display: block;
+			}
+		</style>
 	</body>
 </html>

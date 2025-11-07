@@ -1,0 +1,279 @@
+---
+// Carica i dati dal file JSON locale
+import galleryData from "../data/pixarviz_cover.json";
+
+// Prepara i dati con percorsi ottimizzati per WebP
+const processedData = galleryData.map(item => {
+	const filename = item.SRC.split("/").pop() || "";
+	const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
+	const nameWithoutExt = filename.replace(extPattern, "");
+
+	return {
+		...item,
+		optimizedSrc: `/images/${nameWithoutExt}.webp`,
+	};
+});
+---
+
+<div id="canvas-container" data-gallery={JSON.stringify(processedData)}></div>
+<div id="image-title"></div>
+
+<style>
+	#image-title {
+		position: fixed;
+		bottom: 2rem;
+		left: 2rem;
+		color: #000000;
+		font-size: 2rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.3s ease;
+		z-index: 100;
+		font-family:
+			"Inter",
+			-apple-system,
+			BlinkMacSystemFont,
+			"Segoe UI",
+			"Roboto",
+			"Helvetica Neue",
+			Arial,
+			sans-serif;
+	}
+
+	#image-title.visible {
+		opacity: 1;
+	}
+</style>
+
+<script>
+	import * as THREE from "three";
+
+	// Setup scena
+	const scene = new THREE.Scene();
+	scene.background = new THREE.Color(0xffffff);
+
+	// Camera isometrica
+	const aspect = window.innerWidth / window.innerHeight;
+	const frustumSize = 10;
+	const camera = new THREE.OrthographicCamera(
+		(frustumSize * aspect) / -2,
+		(frustumSize * aspect) / 2,
+		frustumSize / 2,
+		frustumSize / -2,
+		0.1,
+		1000
+	);
+
+	// Posizionamento camera per vista isometrica
+	camera.position.set(12, 10, 10);
+	camera.lookAt(0, 0, 0);
+
+	// Renderer
+	const container = document.getElementById("canvas-container");
+	const renderer = new THREE.WebGLRenderer({ antialias: true });
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setPixelRatio(window.devicePixelRatio);
+	container?.appendChild(renderer.domElement);
+
+	// Array per le immagini
+	const images: THREE.Mesh[] = [];
+	const imageData: {
+		mesh: THREE.Mesh;
+		originalY: number;
+		targetY: number;
+		currentY: number;
+	}[] = [];
+
+	// TextureLoader
+	const textureLoader = new THREE.TextureLoader();
+
+	// Funzione per creare le immagini dalla sorgente dati
+	async function loadImages() {
+		try {
+			// Leggi i dati pre-caricati dal server
+			const container = document.getElementById("canvas-container");
+			const galleryDataStr = container?.getAttribute("data-gallery");
+
+			if (!galleryDataStr) {
+				console.error("Nessun dato trovato");
+				return;
+			}
+
+			const data = JSON.parse(galleryDataStr);
+			const numImages = data.length;
+			const spacing = 0.1;
+
+			console.log(
+				`Caricamento di ${numImages} immagini da dati pre-caricati...`
+			);
+
+			// Crea le immagini
+			data.forEach((item: any, i: number) => {
+				// Geometria rettangolare per l'immagine
+				const geometry = new THREE.PlaneGeometry(2, 1.5);
+
+				// Carica direttamente la texture
+				const texture = textureLoader.load(
+					item.optimizedSrc || item.SRC,
+					// onLoad callback
+					loadedTexture => {
+						console.log(`✅ Immagine caricata: ${item.NAME}`);
+						// Ottimizzazioni texture
+						loadedTexture.minFilter = THREE.LinearFilter;
+						loadedTexture.magFilter = THREE.LinearFilter;
+						loadedTexture.generateMipmaps = false;
+					},
+					// onProgress callback
+					undefined,
+					// onError callback
+					error => {
+						console.error(`❌ Errore caricamento ${item.NAME}: ${item.SRC}`);
+					}
+				);
+
+				// Material con texture
+				const material = new THREE.MeshBasicMaterial({ map: texture });
+				const mesh = new THREE.Mesh(geometry, material);
+
+				// Posizionamento con variazioni casuali
+				const x = (Math.random() - 0.02) * 0.02;
+				const y = 1 + (Math.random() - 0.02) * 0.01;
+				const z =
+					(i - (numImages - 1) / 2) * spacing + (Math.random() - 0.2) * 0.08;
+				mesh.position.set(x, y, z);
+
+				// Aggiungi metadata per riferimento
+				mesh.userData = {
+					id: item.ID,
+					name: item.NAME,
+					category: item.CATEGORY,
+				};
+
+				scene.add(mesh);
+				images.push(mesh);
+
+				imageData.push({
+					mesh: mesh,
+					originalY: y,
+					targetY: y,
+					currentY: y,
+				});
+			});
+		} catch (error) {
+			console.error("Errore nel fetch dei dati:", error);
+		}
+	}
+
+	// Carica le immagini
+	loadImages();
+
+	// Raycaster per il hover
+	const raycaster = new THREE.Raycaster();
+	const mouse = new THREE.Vector2();
+	let hoveredImage: THREE.Mesh | null = null;
+
+	// Elemento per mostrare il titolo
+	const titleElement = document.getElementById("image-title");
+
+	// Event listener per il mouse
+	window.addEventListener("mousemove", event => {
+		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+		raycaster.setFromCamera(mouse, camera);
+		const intersects = raycaster.intersectObjects(images);
+
+		// Dispatch custom event per il cursore personalizzato
+		const isHovering = intersects.length > 0;
+		window.dispatchEvent(
+			new CustomEvent("3d-hover", { detail: { isHovering } })
+		);
+
+		// Mostra/nascondi il titolo
+		if (intersects.length > 0 && titleElement) {
+			const hoveredMesh = intersects[0].object as THREE.Mesh;
+			titleElement.textContent = hoveredMesh.userData.name;
+			titleElement.classList.add("visible");
+		} else if (titleElement) {
+			titleElement.classList.remove("visible");
+		}
+
+		// Prima resetta tutte le immagini
+		imageData.forEach(data => {
+			data.targetY = data.originalY;
+		});
+
+		// Poi crea l'effetto onda
+		hoveredImage = null;
+		if (intersects.length > 0) {
+			hoveredImage = intersects[0].object as THREE.Mesh;
+			const hoveredIndex = images.indexOf(hoveredImage);
+
+			if (hoveredIndex !== -1) {
+				// Parametri per l'effetto onda
+				const maxLift = 0.8;
+				const waveRange = 8;
+
+				// Applica l'effetto a tutte le immagini nell'intervallo
+				for (let i = 0; i < imageData.length; i++) {
+					const distance = Math.abs(i - hoveredIndex);
+
+					if (distance <= waveRange) {
+						const influence = 1 - distance / waveRange;
+						const lift = maxLift * Math.pow(influence, 2);
+
+						imageData[i].targetY = imageData[i].originalY + lift;
+					}
+				}
+			}
+		}
+	});
+
+	// Event listener per il click
+	window.addEventListener("click", event => {
+		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+		raycaster.setFromCamera(mouse, camera);
+		const intersects = raycaster.intersectObjects(images);
+
+		if (intersects.length > 0) {
+			const clickedMesh = intersects[0].object as THREE.Mesh;
+			const filmId = clickedMesh.userData.id;
+
+			// Naviga alla pagina del film
+			console.log(`Navigazione a film/${filmId}`);
+			window.location.href = `/film/${filmId}`;
+		}
+	});
+
+	// Gestione resize
+	window.addEventListener("resize", () => {
+		const aspect = window.innerWidth / window.innerHeight;
+		camera.left = (frustumSize * aspect) / -2;
+		camera.right = (frustumSize * aspect) / 2;
+		camera.top = frustumSize / 2;
+		camera.bottom = frustumSize / -2;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+	});
+
+	// Animation loop
+	function animate() {
+		requestAnimationFrame(animate);
+
+		// Animazione smooth per l'hover
+		imageData.forEach(data => {
+			const diff = data.targetY - data.currentY;
+			data.currentY += diff * 0.1;
+			data.mesh.position.y = data.currentY;
+		});
+
+		renderer.render(scene, camera);
+	}
+
+	animate();
+</script>

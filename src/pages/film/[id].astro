@@ -1,0 +1,120 @@
+---
+import filmData from "../../data/pixarviz_page.json";
+
+interface Film {
+	ID: number;
+	TITLE: string;
+	YEAR: number;
+	SRC: string;
+	TECHNIQUE: string | null;
+}
+
+export async function getStaticPaths() {
+	// Usa i dati dal file JSON locale
+	return filmData.map((film: Film) => ({
+		params: { id: film.ID.toString() },
+		props: { film },
+	}));
+}
+
+interface Props {
+	film: Film;
+}
+
+const { film } = Astro.props as Props;
+
+// Usa le immagini WebP ottimizzate dalla cartella public
+const filename = film.SRC.split("/").pop() || "";
+const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
+const nameWithoutExt = filename.replace(extPattern, "");
+const optimizedSrc = `/images/${nameWithoutExt}.webp`;
+
+import "../../styles/style.css";
+import "../../styles/film-detail.css";
+---
+
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<title>{film.TITLE} - Pixar Viz</title>
+	</head>
+	<body>
+		<div id="custom-cursor"></div>
+		<div class="film-detail">
+			<a href="/" class="back-button">← Torna alla galleria</a>
+
+			<div class="film-content">
+				<div class="film-image">
+					<img
+						src={optimizedSrc}
+						alt={film.TITLE}
+						loading="eager"
+						width="800"
+						height="600"
+					/>
+				</div>
+
+				<div class="film-info">
+					<h1>{film.TITLE}</h1>
+					<p class="year">Anno: {film.YEAR}</p>
+					{
+						film.TECHNIQUE && (
+							<div class="technique">
+								<h2>Tecnica</h2>
+								<p>{film.TECHNIQUE}</p>
+							</div>
+						)
+					}
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Custom cursor
+			const cursor = document.getElementById("custom-cursor");
+
+			document.addEventListener("mousemove", e => {
+				if (!cursor) return;
+
+				cursor.style.left = e.clientX + "px";
+				cursor.style.top = e.clientY + "px";
+
+				// Temporarily hide cursor to detect element underneath
+				cursor.style.pointerEvents = "none";
+				const elementUnderCursor = document.elementFromPoint(
+					e.clientX,
+					e.clientY
+				);
+				cursor.style.pointerEvents = "none"; // Keep it none
+
+				// Check if it's an interactive element
+				if (elementUnderCursor && elementUnderCursor !== cursor) {
+					const isInteractive =
+						elementUnderCursor.tagName === "BUTTON" ||
+						elementUnderCursor.tagName === "A" ||
+						elementUnderCursor.tagName === "INPUT" ||
+						elementUnderCursor.tagName === "SELECT" ||
+						elementUnderCursor.tagName === "TEXTAREA" ||
+						elementUnderCursor.closest("button, a, input, select, textarea");
+
+					if (isInteractive) {
+						cursor.classList.add("hover");
+					} else {
+						cursor.classList.remove("hover");
+					}
+				} else {
+					cursor.classList.remove("hover");
+				}
+			});
+		</script>
+	</body>
+</html>

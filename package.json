@@ -4,11 +4,17 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run optimize-images && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "optimize-images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
-    "astro": "^5.15.3"
+    "astro": "^5.15.3",
+    "three": "^0.181.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.181.0",
+    "sharp": "^0.34.5"
   }
 }
