@@ -177,10 +177,12 @@ const processedData = galleryData.map(item => {
 		// Mostra/nascondi le info
 		if (intersects.length > 0 && titleElement) {
 			const hoveredMesh = intersects[0].object as THREE.Mesh;
-			if (nameElement) nameElement.textContent = hoveredMesh.userData.name.toUpperCase();
+			if (nameElement)
+				nameElement.textContent = hoveredMesh.userData.name.toUpperCase();
 			if (categoryElement) {
 				const category = hoveredMesh.userData.category;
-				const capitalizedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+				const capitalizedCategory =
+					category.charAt(0).toUpperCase() + category.slice(1);
 				categoryElement.textContent = `Category: ${capitalizedCategory}`;
 			}
 			if (idElement) idElement.textContent = `ID: ${hoveredMesh.userData.id}`;
