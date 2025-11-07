@@ -64,10 +64,19 @@ const processedData = galleryData.map(item => {
 		originalY: number;
 		targetY: number;
 		currentY: number;
+		originalX: number;
+		currentX: number;
+		originalZ: number;
+		currentZ: number;
+		delay: number;
 	}[] = [];
 
 	// TextureLoader
 	const textureLoader = new THREE.TextureLoader();
+
+	// Variabili per animazione iniziale
+	let isInitialAnimationComplete = false;
+	const initialAnimationStartTime = Date.now();
 
 	// Funzione per creare le immagini dalla sorgente dati
 	async function loadImages() {
@@ -83,7 +92,7 @@ const processedData = galleryData.map(item => {
 
 			const data = JSON.parse(galleryDataStr);
 			const numImages = data.length;
-			const spacing = 0.1;
+			const spacing = 0.2;
 
 			console.log(
 				`Caricamento di ${numImages} immagini da dati pre-caricati...`
@@ -117,12 +126,22 @@ const processedData = galleryData.map(item => {
 				const material = new THREE.MeshBasicMaterial({ map: texture });
 				const mesh = new THREE.Mesh(geometry, material);
 
-				// Posizionamento con variazioni casuali
-				const x = (Math.random() - 0.02) * 0.02;
-				const y = 1 + (Math.random() - 0.02) * 0.01;
-				const z =
+				// Posizionamento finale con variazioni casuali
+				const finalX = (Math.random() - 0.02) * 0.02;
+				const finalY = 1 + (Math.random() - 0.02) * 0.01;
+				const finalZ =
 					(i - (numImages - 1) / 2) * spacing + (Math.random() - 0.2) * 0.08;
-				mesh.position.set(x, y, z);
+
+				// Posizione iniziale (leggero spostamento in alto a destra)
+				const startX = finalX + 0.1;
+				const startY = finalY + 0.2;
+				const startZ = finalZ + 0.1;
+
+				mesh.position.set(startX, startY, startZ);
+
+				// Imposta opacity iniziale a 0
+				material.transparent = true;
+				material.opacity = 0;
 
 				// Aggiungi metadata per riferimento
 				mesh.userData = {
@@ -134,11 +153,19 @@ const processedData = galleryData.map(item => {
 				scene.add(mesh);
 				images.push(mesh);
 
+				// Delay scaglionato per effetto cascata
+				const delay = i * 40; // 40ms tra ogni immagine
+
 				imageData.push({
 					mesh: mesh,
-					originalY: y,
-					targetY: y,
-					currentY: y,
+					originalY: finalY,
+					targetY: finalY,
+					currentY: startY,
+					originalX: finalX,
+					currentX: startX,
+					originalZ: finalZ,
+					currentZ: startZ,
+					delay: delay,
 				});
 			});
 		} catch (error) {
@@ -204,8 +231,8 @@ const processedData = galleryData.map(item => {
 
 			if (hoveredIndex !== -1) {
 				// Parametri per l'effetto onda
-				const maxLift = 0.8;
-				const waveRange = 8;
+				const maxLift = 1;
+				const waveRange = 1;
 
 				// Applica l'effetto a tutte le immagini nell'intervallo
 				for (let i = 0; i < imageData.length; i++) {
@@ -222,8 +249,13 @@ const processedData = galleryData.map(item => {
 		}
 	});
 
+	// Variabile per controllare lo stato dell'animazione
+	let isAnimating = false;
+
 	// Event listener per il click
 	window.addEventListener("click", event => {
+		if (isAnimating) return; // Previene click multipli durante l'animazione
+
 		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -231,14 +263,124 @@ const processedData = galleryData.map(item => {
 		const intersects = raycaster.intersectObjects(images);
 
 		if (intersects.length > 0) {
+			isAnimating = true;
 			const clickedMesh = intersects[0].object as THREE.Mesh;
 			const filmId = clickedMesh.userData.id;
 
-			// Naviga alla pagina del film
-			console.log(`Navigazione a film/${filmId}`);
-			window.location.href = `/film/${filmId}`;
+			// Nascondi le info
+			if (titleElement) {
+				titleElement.classList.remove("visible");
+			}
+
+			// Avvia l'animazione
+			animateTransition(clickedMesh, filmId);
 		}
 	});
+
+	// Funzione per animare la transizione
+	function animateTransition(selectedMesh: THREE.Mesh, filmId: string) {
+		const duration = 1200; // Durata totale in ms
+		const fadeOutDuration = 100; // Durata fade out altre immagini (più veloce)
+		const transitionDuration = 700; // Durata transizione isometrica->2D (più veloce)
+		const startTime = Date.now();
+
+		// Imposta tutte le altre immagini come trasparenti immediatamente
+		images.forEach(mesh => {
+			if (mesh !== selectedMesh) {
+				const material = mesh.material as THREE.MeshBasicMaterial;
+				material.transparent = true;
+			}
+		});
+
+		// Posizione iniziale della camera
+		const initialCameraPos = camera.position.clone();
+		const initialCameraTarget = new THREE.Vector3(0, 0, 0);
+
+		// Posizione finale della camera (frontale)
+		const finalCameraPos = new THREE.Vector3(
+			selectedMesh.position.x,
+			selectedMesh.position.y,
+			selectedMesh.position.z + 5
+		);
+		const finalCameraTarget = selectedMesh.position.clone();
+
+		// Posizione e scala iniziale dell'immagine selezionata
+		const initialPos = selectedMesh.position.clone();
+		const initialScale = selectedMesh.scale.clone();
+		const finalScale = new THREE.Vector3(1.5, 1.5, 1.5); // Scala più grande
+
+		function updateTransition() {
+			const elapsed = Date.now() - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+
+			// Easing function per fade (ease-out quartico)
+			const easeFade = (t: number) => 1 - Math.pow(1 - t, 4);
+
+			// Easing function per transizione (ease-out cubico - veloce ma fluido)
+			const easeTransition = (t: number) => 1 - Math.pow(1 - t, 3);
+
+			// Fase 1: Fade out delle altre immagini
+			if (elapsed <= fadeOutDuration) {
+				const fadeProgress = easeFade(elapsed / fadeOutDuration);
+				images.forEach(mesh => {
+					if (mesh !== selectedMesh) {
+						const material = mesh.material as THREE.MeshBasicMaterial;
+						material.opacity = 1 - fadeProgress;
+					}
+				});
+			} else {
+				// Nascondi completamente le altre immagini
+				images.forEach(mesh => {
+					if (mesh !== selectedMesh) {
+						mesh.visible = false;
+					}
+				});
+			}
+
+			// Fase 2: Transizione camera e immagine veloce e fluida
+			if (elapsed > 100) {
+				const transitionProgress = Math.min(
+					(elapsed - 100) / transitionDuration,
+					1
+				);
+				const easeValue = easeTransition(transitionProgress);
+
+				// Interpola posizione camera
+				camera.position.lerpVectors(
+					initialCameraPos,
+					finalCameraPos,
+					easeValue
+				);
+
+				// Interpola target camera
+				const currentTarget = new THREE.Vector3();
+				currentTarget.lerpVectors(
+					initialCameraTarget,
+					finalCameraTarget,
+					easeValue
+				);
+				camera.lookAt(currentTarget);
+
+				// Scala l'immagine selezionata
+				selectedMesh.scale.lerpVectors(initialScale, finalScale, easeValue);
+
+				// Centra l'immagine
+				const centerPos = new THREE.Vector3(0, 0, selectedMesh.position.z);
+				selectedMesh.position.lerpVectors(initialPos, centerPos, easeValue);
+			}
+
+			// Continua l'animazione o naviga alla pagina
+			if (progress < 1) {
+				requestAnimationFrame(updateTransition);
+			} else {
+				// Animazione completata, naviga alla pagina
+				console.log(`Navigazione a film/${filmId}`);
+				window.location.href = `/film/${filmId}`;
+			}
+		}
+
+		updateTransition();
+	}
 
 	// Gestione resize
 	window.addEventListener("resize", () => {
@@ -255,12 +397,76 @@ const processedData = galleryData.map(item => {
 	function animate() {
 		requestAnimationFrame(animate);
 
-		// Animazione smooth per l'hover
-		imageData.forEach(data => {
-			const diff = data.targetY - data.currentY;
-			data.currentY += diff * 0.1;
-			data.mesh.position.y = data.currentY;
-		});
+		// Animazione iniziale di caricamento
+		if (!isInitialAnimationComplete) {
+			const elapsed = Date.now() - initialAnimationStartTime;
+			const animationDuration = 800; // Durata animazione per ogni immagine
+			let allComplete = true;
+
+			imageData.forEach(data => {
+				const imageElapsed = elapsed - data.delay;
+
+				if (imageElapsed > 0) {
+					const progress = Math.min(imageElapsed / animationDuration, 1);
+
+					// Easing function (ease-out cubic per movimento fluido)
+					const easeProgress = 1 - Math.pow(1 - progress, 3);
+
+					// Interpola posizioni con movimento leggero
+					data.currentX =
+						data.currentX + (data.originalX - data.currentX) * 0.08;
+					data.currentY =
+						data.currentY + (data.originalY - data.currentY) * 0.08;
+					data.currentZ =
+						data.currentZ + (data.originalZ - data.currentZ) * 0.08;
+
+					data.mesh.position.set(data.currentX, data.currentY, data.currentZ);
+
+					// Fade-in dell'opacity
+					const material = data.mesh.material as THREE.MeshBasicMaterial;
+					const targetOpacity = 1;
+					material.opacity =
+						material.opacity + (targetOpacity - material.opacity) * 0.08;
+
+					// Controlla se questa immagine ha completato l'animazione
+					const threshold = 0.01;
+					if (
+						Math.abs(data.currentX - data.originalX) > threshold ||
+						Math.abs(data.currentY - data.originalY) > threshold ||
+						Math.abs(data.currentZ - data.originalZ) > threshold ||
+						Math.abs(material.opacity - targetOpacity) > 0.01
+					) {
+						allComplete = false;
+					}
+				} else {
+					allComplete = false;
+				}
+			});
+
+			if (allComplete) {
+				isInitialAnimationComplete = true;
+				// Imposta le posizioni e opacity finali esatte
+				imageData.forEach(data => {
+					data.currentX = data.originalX;
+					data.currentY = data.originalY;
+					data.currentZ = data.originalZ;
+					data.mesh.position.set(
+						data.originalX,
+						data.originalY,
+						data.originalZ
+					);
+					const material = data.mesh.material as THREE.MeshBasicMaterial;
+					material.opacity = 1;
+				});
+			}
+		} else {
+			// Animazione smooth per l'hover (solo dopo l'animazione iniziale)
+			imageData.forEach(data => {
+				const diff = data.targetY - data.currentY;
+				data.currentY += diff * 0.1;
+				data.mesh.position.y = data.currentY;
+			});
+		}
 
 		renderer.render(scene, camera);
 	}

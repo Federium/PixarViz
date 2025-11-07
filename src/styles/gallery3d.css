@@ -25,19 +25,17 @@
 /* Nome del film - grande e bold */
 #image-name {
 	color: #000000;
-	font-size: 2rem;
+	font-size: 4rem;
 	font-weight: 700;
-	letter-spacing: 0.05em;
 	line-height: 1.2;
-	margin-bottom: 0.5rem;
+	margin-bottom: 1rem;
 }
 
 /* Categoria - medio */
 #image-category {
 	color: #000000;
-	font-size: 1.2rem;
+	font-size: 1rem;
 	font-weight: 500;
-	letter-spacing: 0.03em;
 	line-height: 1.3;
 	margin-bottom: 0.3rem;
 }
@@ -45,8 +43,7 @@
 /* ID - stesso stile della categoria */
 #image-id {
 	color: #000000;
-	font-size: 1.2rem;
+	font-size: 1rem;
 	font-weight: 500;
-	letter-spacing: 0.03em;
-	line-height: 1.4;
+	line-height: 1.3;
 }
