@@ -1,6 +1,7 @@
 ---
 // Carica i dati dal file JSON locale
 import galleryData from "../data/pixarviz_cover.json";
+import "../styles/gallery3d.css";
 
 // Prepara i dati con percorsi ottimizzati per WebP
 const processedData = galleryData.map(item => {
@@ -16,44 +17,20 @@ const processedData = galleryData.map(item => {
 ---
 
 <div id="canvas-container" data-gallery={JSON.stringify(processedData)}></div>
-<div id="image-title"></div>
-
-<style>
-	#image-title {
-		position: fixed;
-		bottom: 2rem;
-		left: 2rem;
-		color: #000000;
-		font-size: 2rem;
-		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 0.3s ease;
-		z-index: 100;
-		font-family:
-			"Inter",
-			-apple-system,
-			BlinkMacSystemFont,
-			"Segoe UI",
-			"Roboto",
-			"Helvetica Neue",
-			Arial,
-			sans-serif;
-	}
-
-	#image-title.visible {
-		opacity: 1;
-	}
-</style>
+<div id="image-info">
+	<div id="image-name"></div>
+	<div id="image-category"></div>
+	<div id="image-id"></div>
+</div>
 
 <script>
 	import * as THREE from "three";
 
 	// Setup scena
 	const scene = new THREE.Scene();
-	scene.background = new THREE.Color(0xffffff);
+	// Gestione background rimossa dallo script: verrà definita via CSS.
+	// Renderizziamo la canvas con alpha:true (vedi renderer) per permettere
+	// allo sfondo CSS di essere visibile attraverso la canvas.
 
 	// Camera isometrica
 	const aspect = window.innerWidth / window.innerHeight;
@@ -73,7 +50,9 @@ const processedData = galleryData.map(item => {
 
 	// Renderer
 	const container = document.getElementById("canvas-container");
-	const renderer = new THREE.WebGLRenderer({ antialias: true });
+	// Abilitiamo alpha:true così la canvas è trasparente e lascia vedere
+	// lo sfondo definito dal CSS del `#canvas-container`.
+	const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
 	container?.appendChild(renderer.domElement);
@@ -176,7 +155,10 @@ const processedData = galleryData.map(item => {
 	let hoveredImage: THREE.Mesh | null = null;
 
 	// Elemento per mostrare il titolo
-	const titleElement = document.getElementById("image-title");
+	const titleElement = document.getElementById("image-info");
+	const nameElement = document.getElementById("image-name");
+	const categoryElement = document.getElementById("image-category");
+	const idElement = document.getElementById("image-id");
 
 	// Event listener per il mouse
 	window.addEventListener("mousemove", event => {
@@ -192,10 +174,16 @@ const processedData = galleryData.map(item => {
 			new CustomEvent("3d-hover", { detail: { isHovering } })
 		);
 
-		// Mostra/nascondi il titolo
+		// Mostra/nascondi le info
 		if (intersects.length > 0 && titleElement) {
 			const hoveredMesh = intersects[0].object as THREE.Mesh;
-			titleElement.textContent = hoveredMesh.userData.name;
+			if (nameElement) nameElement.textContent = hoveredMesh.userData.name.toUpperCase();
+			if (categoryElement) {
+				const category = hoveredMesh.userData.category;
+				const capitalizedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+				categoryElement.textContent = `Category: ${capitalizedCategory}`;
+			}
+			if (idElement) idElement.textContent = `ID: ${hoveredMesh.userData.id}`;
 			titleElement.classList.add("visible");
 		} else if (titleElement) {
 			titleElement.classList.remove("visible");
