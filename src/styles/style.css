@@ -46,8 +46,8 @@ body {
 	width: 100vw;
 	height: 100vh;
 	/* Background immagine dalla cartella assets */
-  background-image: url('/src/assets/Background/Background.jpg');
+  /* background-image: url('/src/assets/Background/Background.jpg');
 	background-size: cover;
 	background-position: center;
-	background-repeat: no-repeat;
+	background-repeat: no-repeat; */
 }
