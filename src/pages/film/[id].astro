@@ -31,6 +31,8 @@ const optimizedSrc = `/images/${nameWithoutExt}.webp`;
 
 import "../../styles/style.css";
 import "../../styles/film-detail.css";
+import FilmHeader from "../../components/FilmHeader.astro";
+import Footer from "../../components/Footer.astro";
 ---
 
 <html lang="it">
@@ -49,9 +51,8 @@ import "../../styles/film-detail.css";
 	</head>
 	<body>
 		<div id="custom-cursor"></div>
+		<FilmHeader />
 		<div class="film-detail">
-			<a href="/" class="back-button">← Torna alla galleria</a>
-
 			<div class="film-content">
 				<div class="film-image">
 					<img
@@ -77,6 +78,7 @@ import "../../styles/film-detail.css";
 				</div>
 			</div>
 		</div>
+		<Footer />
 
 		<script>
 			// Custom cursor

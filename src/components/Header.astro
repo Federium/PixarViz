@@ -1,0 +1,157 @@
+---
+// Header component
+---
+
+<header id="main-header">
+	<div class="header-left">
+		<a href="#about" class="header-link">About</a>
+	</div>
+
+	<div class="header-center">
+		<span class="header-title">© Pixar 3D ARCHIVE</span>
+	</div>
+
+	<div class="header-right">
+		<button id="view-toggle" class="view-switch">
+			<span id="timeline-option" class="switch-option">
+				<span class="circle">●</span> Timeline
+			</span>
+			<span id="list-option" class="switch-option">
+				<span class="circle">○</span> List
+			</span>
+		</button>
+	</div>
+</header>
+
+<style>
+	#main-header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem 1rem;
+		z-index: 1000;
+		pointer-events: none;
+	}
+
+	.header-left,
+	.header-center,
+	.header-right {
+		flex: 1;
+		pointer-events: auto;
+	}
+
+	.header-left {
+		display: flex;
+		justify-content: flex-start;
+	}
+
+	.header-center {
+		display: flex;
+		justify-content: center;
+	}
+
+	.header-right {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.header-link {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		font-weight: 600;
+		color: #000000;
+		text-decoration: none;
+		background: none;
+		border: none;
+		cursor: pointer;
+		mix-blend-mode: difference;
+		color: #000000;
+	}
+
+	.view-switch {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		font-weight: 600;
+		background: none;
+		border: none;
+		cursor: pointer;
+		display: flex;
+		gap: 1rem;
+		mix-blend-mode: difference;
+	}
+
+	.switch-option {
+		color: #000000;
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
+	}
+
+	.switch-option .circle {
+		transition: none;
+	}
+
+	.header-title {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		color: #000000;
+		mix-blend-mode: difference;
+		user-select: none;
+	}
+
+	@media (max-width: 768px) {
+		#main-header {
+			padding: 1.5rem 1.5rem;
+			flex-direction: column;
+			gap: 1rem;
+			align-items: center;
+		}
+
+		.header-left,
+		.header-center,
+		.header-right {
+			flex: none;
+		}
+
+		.header-center {
+			order: -1;
+		}
+
+		.header-link,
+		.header-title {
+			font-size: 14pt;
+		}
+	}
+</style>
+
+<script>
+	// Toggle view functionality
+	const toggleButton = document.getElementById("view-toggle");
+	const timelineOption = document.getElementById("timeline-option");
+	const listOption = document.getElementById("list-option");
+	let isTableView = false;
+
+	toggleButton?.addEventListener("click", () => {
+		isTableView = !isTableView;
+
+		// Update circle symbols
+		const timelineCircle = timelineOption?.querySelector(".circle");
+		const listCircle = listOption?.querySelector(".circle");
+
+		if (isTableView) {
+			if (timelineCircle) timelineCircle.textContent = "○";
+			if (listCircle) listCircle.textContent = "●";
+		} else {
+			if (timelineCircle) timelineCircle.textContent = "●";
+			if (listCircle) listCircle.textContent = "○";
+		}
+
+		// Dispatch custom event for view change
+		const event = new CustomEvent("viewToggle", { detail: { isTableView } });
+		window.dispatchEvent(event);
+	});
+</script>

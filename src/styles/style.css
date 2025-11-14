@@ -1,3 +1,69 @@
+/* PP Mori Font Family */
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-Extralight.otf') format('opentype');
+	font-weight: 200;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-ExtralightItalic.otf') format('opentype');
+	font-weight: 200;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-Regular.otf') format('opentype');
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-RegularItalic.otf') format('opentype');
+	font-weight: 400;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-Semibold.otf') format('opentype');
+	font-weight: 600;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-SemiboldItalic.otf') format('opentype');
+	font-weight: 600;
+	font-style: italic;
+}
+
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-Black.otf') format('opentype');
+	font-weight: 900;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'PP Mori';
+	src: url('/src/assets/Fonts/PPMori-BlackItalic.otf') format('opentype');
+	font-weight: 900;
+	font-style: italic;
+}
+
+/* CSS Variables */
+:root {
+	--font-family: 'PP Mori', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+	--font-size: 0.8rem;
+	--font-size-small: 1rem;
+	--font-size-medium: 1.2rem;
+	--font-size-large: 4rem;
+}
+
 * {
 	margin: 0;
 	padding: 0;
@@ -9,7 +75,7 @@ body {
 	width: 100vw;
 	height: 100vh;
 	background: #ffffff;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+	font-family: var(--font-family);
 }
 
 /* Custom cursor */

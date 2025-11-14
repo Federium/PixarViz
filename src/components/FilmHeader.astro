@@ -1,0 +1,92 @@
+---
+// Film Header component - header semplificato per pagina dettaglio film
+---
+
+<header id="film-header">
+	<div class="header-left">
+		<a href="/" class="header-link">← Back</a>
+	</div>
+
+	<div class="header-center">
+		<span class="header-title">© Pixar 3D ARCHIVE</span>
+	</div>
+
+	<div class="header-right">
+		<!-- Vuoto -->
+	</div>
+</header>
+
+<style>
+	#film-header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem 1rem;
+		z-index: 1000;
+		pointer-events: none;
+	}
+
+	.header-left,
+	.header-center,
+	.header-right {
+		flex: 1;
+		pointer-events: auto;
+	}
+
+	.header-left {
+		display: flex;
+		justify-content: flex-start;
+	}
+
+	.header-center {
+		display: flex;
+		justify-content: center;
+	}
+
+	.header-right {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.header-link {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		font-weight: 600;
+		color: #000000;
+		text-decoration: none;
+		background: none;
+		border: none;
+		cursor: pointer;
+		transition: opacity 0.3s ease;
+		mix-blend-mode: difference;
+	}
+
+	.header-link:hover {
+		opacity: 0.7;
+	}
+
+	.header-title {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		color: #000000;
+		mix-blend-mode: difference;
+		user-select: none;
+		font-weight: 600;
+	}
+
+	@media (max-width: 768px) {
+		#film-header {
+			padding: 1rem 1rem;
+			flex-direction: row;
+		}
+
+		.header-link,
+		.header-title {
+			font-size: 0.7rem;
+		}
+	}
+</style>

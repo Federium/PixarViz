@@ -16,211 +16,142 @@ const processedData = galleryData.map(item => {
 ---
 
 <div class="archive-container">
-	<table class="archive-table">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Preview</th>
-				<th>Name</th>
-				<th>Category</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			{
-				processedData.map(item => (
-					<tr class="archive-row" data-id={item.ID}>
-						<td class="archive-id">{item.ID}</td>
-						<td class="archive-preview">
-							<img src={item.optimizedSrc} alt={item.NAME} loading="lazy" />
-						</td>
-						<td class="archive-name">{item.NAME}</td>
-						<td class="archive-category">{item.CATEGORY}</td>
-						<td class="archive-action">
-							<a href={`/film/${item.ID}`} class="view-btn">
-								VIEW
-							</a>
-						</td>
-					</tr>
-				))
-			}
-		</tbody>
-	</table>
+	<div class="archive-list">
+		{
+			processedData.map(item => (
+				<a
+					href={`/film/${item.ID}`}
+					class="archive-item"
+					data-image={item.optimizedSrc}
+					data-name={item.NAME}
+				>
+					<span class="item-id">{item.ID}</span>
+					<span class="item-name">{item.NAME}</span>
+					<span class="item-category">{item.CATEGORY}</span>
+				</a>
+			))
+		}
+	</div>
+	<div id="hover-image" class="hover-image">
+		<img src="" alt="" />
+	</div>
 </div>
 
 <style>
 	.archive-container {
 		width: 100%;
 		min-height: 100vh;
-		padding: 4rem 2rem 2rem 2rem;
-		overflow-x: auto;
-		margin-top: 20vh;
+		padding: 2rem 1rem;
+		margin-top: 0;
 	}
 
-	.archive-table {
+	.archive-list {
 		width: 100%;
-		border-collapse: collapse;
-		font-family:
-			"Inter",
-			-apple-system,
-			BlinkMacSystemFont,
-			"Segoe UI",
-			"Roboto",
-			"Helvetica Neue",
-			Arial,
-			sans-serif;
 	}
 
-	.archive-table thead {
-		background: transparent;
+	.archive-item {
+		display: grid;
+		grid-template-columns: 80px 1fr 200px;
+		gap: 2rem;
+		margin: 0.5rem 0;
+		text-decoration: none;
 		color: #000000;
+		font-family: var(--font-family);
+		transition: opacity 0.2s ease;
 	}
 
-	.archive-table th {
-		padding: 1rem 1rem 1rem 0;
-		text-align: left;
-		font-weight: 900;
-		text-transform: uppercase;
-		letter-spacing: 0.15em;
-		font-size: 0.75rem;
-		border: none;
-		border-bottom: 3px solid #000000;
+	.item-id {
+		font-size: var(--font-size);
+		font-weight: 600;
 	}
 
-	.archive-table tbody tr {
-		border: none;
-		border-bottom: 1px solid #000000;
-		transition: none;
-	}
-
-	.archive-table tbody tr:hover {
-		background: transparent;
-	}
-
-	.archive-table tbody tr:hover .archive-name {
-		text-decoration: underline;
-		text-decoration-thickness: 3px;
-	}
-
-	.archive-table tbody tr:last-child {
-		border-bottom: 3px solid #000000;
-	}
-
-	.archive-table td {
-		padding: 1.5rem 1rem 1.5rem 0;
-		vertical-align: middle;
-		border: none;
-	}
-
-	.archive-id {
-		font-weight: 900;
-		font-size: 1.5rem;
-		width: 100px;
-	}
-
-	.archive-preview {
-		width: 100px;
-	}
-
-	.archive-preview img {
-		width: 80px;
-		height: 60px;
-		object-fit: cover;
-		border: none;
-		display: block;
-		filter: grayscale(100%) contrast(1.2);
-	}
-
-	.archive-name {
-		font-weight: 700;
-		font-size: 1.3rem;
+	.item-name {
+		font-size: var(--font-size);
+		font-weight: 600;
 		text-transform: uppercase;
 		letter-spacing: 0.02em;
 	}
 
-	.archive-category {
-		font-weight: 400;
-		font-size: 1rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: #000000;
+	.item-category {
+		font-size: var(--font-size);
+		font-weight: 600;
+		text-transform: capitalize;
+		text-align: left;
 	}
 
-	.archive-action {
-		text-align: right;
-		width: 150px;
+	.hover-image {
+		position: fixed;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+		z-index: 1;
+		transform: translate(-50%, -50%);
 	}
 
-	.view-btn {
-		display: inline-block;
-		padding: 0;
-		background: transparent;
-		color: #000000;
-		text-decoration: none;
-		font-weight: 900;
-		text-transform: uppercase;
-		letter-spacing: 0.15em;
-		font-size: 1rem;
-		border: none;
-		transition: none;
+	.hover-image.visible {
+		opacity: 1;
 	}
 
-	.view-btn:hover {
-		text-decoration: underline;
-		text-decoration-thickness: 3px;
+	.hover-image img {
+		width: 300px;
+		height: auto;
+		display: block;
+		object-fit: cover;
 	}
 
 	@media (max-width: 768px) {
 		.archive-container {
-			padding: 4rem 1rem 1rem 1rem;
+			padding: 3rem 1rem 2rem 1rem;
 		}
 
-		.archive-table {
-			font-size: 0.85rem;
+		.archive-item {
+			grid-template-columns: 60px 1fr 120px;
+			gap: 1rem;
+			padding: 0.4rem 0;
 		}
 
-		.archive-table th {
-			padding: 0.75rem 0.5rem 0.75rem 0;
-			font-size: 0.65rem;
-			border-bottom: 2px solid #000000;
+		.item-id,
+		.item-name,
+		.item-category {
+			font-size: 0.7rem;
 		}
 
-		.archive-table td {
-			padding: 1rem 0.5rem 1rem 0;
-		}
-
-		.archive-table tbody tr:last-child {
-			border-bottom: 2px solid #000000;
-		}
-
-		.archive-id {
-			font-size: 1.2rem;
-			width: 60px;
-		}
-
-		.archive-preview {
-			width: 70px;
-		}
-
-		.archive-preview img {
-			width: 60px;
-			height: 45px;
-		}
-
-		.archive-name {
-			font-size: 1rem;
-		}
-
-		.archive-category {
-			font-size: 0.85rem;
-		}
-
-		.view-btn {
-			font-size: 0.85rem;
-		}
-
-		.view-btn:hover {
-			text-decoration-thickness: 2px;
+		.hover-image img {
+			width: 200px;
 		}
 	}
 </style>
+
+<script>
+	const archiveItems = document.querySelectorAll(".archive-item");
+	const hoverImage = document.getElementById("hover-image");
+	const hoverImg = hoverImage?.querySelector("img");
+
+	archiveItems.forEach(item => {
+		item.addEventListener("mouseenter", e => {
+			const target = e.currentTarget as HTMLElement;
+			const imageSrc = target.getAttribute("data-image");
+			const imageName = target.getAttribute("data-name");
+
+			if (hoverImage && hoverImg && imageSrc) {
+				hoverImg.src = imageSrc;
+				hoverImg.alt = imageName || "";
+				hoverImage.classList.add("visible");
+			}
+		});
+
+		item.addEventListener("mouseleave", () => {
+			if (hoverImage) {
+				hoverImage.classList.remove("visible");
+			}
+		});
+
+		item.addEventListener("mousemove", e => {
+			const mouseEvent = e as MouseEvent;
+			if (hoverImage) {
+				hoverImage.style.left = mouseEvent.clientX + "px";
+				hoverImage.style.top = mouseEvent.clientY + "px";
+			}
+		});
+	});
+</script>
