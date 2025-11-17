@@ -198,19 +198,53 @@ const processedData = galleryData.map((item, index) => {
 		".placeholder-box"
 	) as HTMLElement;
 
-	// Function to get random position within viewport
-	function getRandomPosition() {
-		const margin = 50; // Keep some margin from edges
-		const maxX = window.innerWidth - 150 - margin; // 150 is image width
-		const maxY = window.innerHeight - 112 - margin; // 112 is approx image height
+	const totalItems = archiveItems.length;
 
-		const randomX = margin + Math.random() * maxX;
-		const randomY = margin + Math.random() * maxY;
+	// Function to get bouncing position based on item index
+	function getBouncingPosition(index: number) {
+		const viewportWidth = window.innerWidth;
+		const viewportHeight = window.innerHeight;
+		const imageWidth = 150;
+		const imageHeight = 112;
 
-		return { x: randomX, y: randomY };
+		// Normalize index to 0-1 range
+		const normalizedIndex = index / (totalItems - 1);
+
+		// X position: linear from left to right
+		const margin = 50;
+		const xPosition =
+			margin + (viewportWidth - 2 * margin - imageWidth) * normalizedIndex;
+
+		// Y position: create 4 bounces with varying heights
+		const bounces = 4;
+		const baseY = viewportHeight - imageHeight - margin; // Bottom baseline
+
+		// Sine wave for bouncing
+		const sineValue = Math.abs(Math.sin(normalizedIndex * Math.PI * bounces));
+
+		// Determine which bounce we're in (0, 1, 2, or 3)
+		const bouncePhase = Math.floor(normalizedIndex * bounces);
+
+		// Different amplitudes for each bounce: progressive height increase
+		let amplitude;
+		if (bouncePhase < 3) {
+			amplitude = viewportHeight * 0.15; // First three bounces: lower
+		} else {
+			amplitude = viewportHeight * 0.4; // Last bounce: much higher
+		}
+
+		const yPosition = baseY - amplitude * sineValue;
+
+		// Ensure Y position stays within viewport
+		const clampedY = Math.max(
+			margin,
+			Math.min(yPosition, viewportHeight - imageHeight - margin)
+		);
+
+		return { x: xPosition, y: clampedY };
 	}
 
-	archiveItems.forEach(item => {
+	archiveItems.forEach((item, index) => {
 		item.addEventListener("mouseenter", e => {
 			const target = e.currentTarget as HTMLElement;
 			const imageSrc = target.getAttribute("data-image");
@@ -218,8 +252,8 @@ const processedData = galleryData.map((item, index) => {
 			const imageName = target.getAttribute("data-name");
 
 			if (hoverImage) {
-				// Get random position
-				const pos = getRandomPosition();
+				// Get bouncing position based on index
+				const pos = getBouncingPosition(index);
 				hoverImage.style.left = pos.x + "px";
 				hoverImage.style.top = pos.y + "px";
 
