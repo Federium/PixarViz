@@ -21,6 +21,9 @@
 	font-weight: 700;
 	line-height: 1.2;
 	margin-bottom: 1rem;
+	max-width: 50vw;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 /* Categoria - medio */

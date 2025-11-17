@@ -1,17 +1,64 @@
 ---
 // Carica i dati dal file JSON locale
-import galleryData from "../data/pixarviz_cover.json";
+import galleryData from "../data/pixar_archivio.json";
 import "../styles/gallery3d.css";
 
+// Generate random color for placeholder
+function getRandomColor(seed: number): string {
+	const colors = [
+		"#FF6B6B",
+		"#4ECDC4",
+		"#45B7D1",
+		"#FFA07A",
+		"#98D8C8",
+		"#F7DC6F",
+		"#BB8FCE",
+		"#85C1E2",
+		"#F8B195",
+		"#6C5CE7",
+		"#A8E6CF",
+		"#FFD3B6",
+		"#FFAAA5",
+		"#FF8B94",
+		"#C7CEEA",
+	];
+	return colors[seed % colors.length];
+}
+
 // Prepara i dati con percorsi ottimizzati per WebP
-const processedData = galleryData.map(item => {
-	const filename = item.SRC.split("/").pop() || "";
+const processedData = galleryData.map((item, index) => {
+	const raw: any = item;
+	const name =
+		raw["Film/corto"] || raw["Personaggio/soggetto"] || `Film ${index + 1}`;
+	const category = raw["Categoria Innovazione (tag)"] || "";
+
+	// Prefer `Copertina` if present, otherwise fall back to first ImgXX
+	let src = raw.Copertina || "";
+	if (!src) {
+		for (let i = 1; i <= 10; i++) {
+			const key = `Img${String(i).padStart(2, "0")}`;
+			if (raw[key]) {
+				src = raw[key];
+				break;
+			}
+		}
+	}
+
 	const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
+	const filename = src ? src.split("/").pop() || "" : "";
 	const nameWithoutExt = filename.replace(extPattern, "");
 
+	// Generate placeholder color if no image
+	const placeholderColor = !src ? getRandomColor(index) : null;
+
 	return {
-		...item,
-		optimizedSrc: `/images/${nameWithoutExt}.webp`,
+		ID: raw.ID ?? index + 1,
+		NAME: name,
+		CATEGORY: category,
+		SRC: src,
+		optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
+		placeholderColor: placeholderColor,
+		raw: raw,
 	};
 });
 ---
@@ -103,27 +150,39 @@ const processedData = galleryData.map(item => {
 				// Geometria rettangolare per l'immagine
 				const geometry = new THREE.PlaneGeometry(2, 1.5);
 
-				// Carica direttamente la texture
-				const texture = textureLoader.load(
-					item.optimizedSrc || item.SRC,
-					// onLoad callback
-					loadedTexture => {
-						console.log(`✅ Immagine caricata: ${item.NAME}`);
-						// Ottimizzazioni texture
-						loadedTexture.minFilter = THREE.LinearFilter;
-						loadedTexture.magFilter = THREE.LinearFilter;
-						loadedTexture.generateMipmaps = false;
-					},
-					// onProgress callback
-					undefined,
-					// onError callback
-					error => {
-						console.error(`❌ Errore caricamento ${item.NAME}: ${item.SRC}`);
-					}
-				);
+				let material: THREE.MeshBasicMaterial;
 
-				// Material con texture
-				const material = new THREE.MeshBasicMaterial({ map: texture });
+				if (item.optimizedSrc || item.SRC) {
+					// Carica direttamente la texture
+					const texture = textureLoader.load(
+						item.optimizedSrc || item.SRC,
+						// onLoad callback
+						loadedTexture => {
+							console.log(`✅ Immagine caricata: ${item.NAME}`);
+							// Ottimizzazioni texture
+							loadedTexture.minFilter = THREE.LinearFilter;
+							loadedTexture.magFilter = THREE.LinearFilter;
+							loadedTexture.generateMipmaps = false;
+						},
+						// onProgress callback
+						undefined,
+						// onError callback
+						error => {
+							console.error(`❌ Errore caricamento ${item.NAME}: ${item.SRC}`);
+						}
+					);
+					// Material con texture
+					material = new THREE.MeshBasicMaterial({ map: texture });
+				} else if (item.placeholderColor) {
+					// Material con colore piatto se nessuna immagine
+					console.log(`🎨 Placeholder colore per: ${item.NAME}`);
+					material = new THREE.MeshBasicMaterial({
+						color: item.placeholderColor,
+					});
+				} else {
+					// Fallback grigio
+					material = new THREE.MeshBasicMaterial({ color: "#CCCCCC" });
+				}
 				const mesh = new THREE.Mesh(geometry, material);
 
 				// Posizionamento finale con variazioni casuali
@@ -204,8 +263,7 @@ const processedData = galleryData.map(item => {
 		// Mostra/nascondi le info
 		if (intersects.length > 0 && titleElement) {
 			const hoveredMesh = intersects[0].object as THREE.Mesh;
-			if (nameElement)
-				nameElement.textContent = hoveredMesh.userData.name.toUpperCase();
+			if (nameElement) nameElement.textContent = hoveredMesh.userData.name;
 			if (categoryElement) {
 				const category = hoveredMesh.userData.category;
 				const capitalizedCategory =

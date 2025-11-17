@@ -1,16 +1,65 @@
 ---
 // Carica i dati dal file JSON locale
-import galleryData from "../data/pixarviz_cover.json";
+import galleryData from "../data/pixar_archivio.json";
 
 // Prepara i dati con percorsi ottimizzati per WebP
-const processedData = galleryData.map(item => {
-	const filename = item.SRC.split("/").pop() || "";
+// Generate random color for placeholder
+function getRandomColor(seed: number): string {
+	const colors = [
+		"#FF6B6B",
+		"#4ECDC4",
+		"#45B7D1",
+		"#FFA07A",
+		"#98D8C8",
+		"#F7DC6F",
+		"#BB8FCE",
+		"#85C1E2",
+		"#F8B195",
+		"#6C5CE7",
+		"#A8E6CF",
+		"#FFD3B6",
+		"#FFAAA5",
+		"#FF8B94",
+		"#C7CEEA",
+	];
+	return colors[seed % colors.length];
+}
+
+const processedData = galleryData.map((item, index) => {
+	const raw: any = item;
+	// New JSON uses Italian keys. Normalize into the shape the components expect.
+	const name = raw["Film/corto"] || raw["Personaggio/soggetto"] || "Untitled";
+	const category = raw["Categoria Innovazione (tag)"] || "";
+
+	// Prefer `Copertina` if present, otherwise look for the first ImgXX field
+	let src = raw.Copertina || "";
+	if (!src) {
+		for (let i = 1; i <= 10; i++) {
+			const key = `Img${String(i).padStart(2, "0")}`;
+			if (raw[key]) {
+				src = raw[key];
+				break;
+			}
+		}
+	}
+
 	const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
+	const filename = src ? src.split("/").pop() || "" : "";
 	const nameWithoutExt = filename.replace(extPattern, "");
 
+	// Generate placeholder color if no image
+	const placeholderColor = !src ? getRandomColor(index) : null;
+
 	return {
-		...item,
-		optimizedSrc: `/images/${nameWithoutExt}.webp`,
+		// Ensure there is an ID for routing (use index+1 when missing)
+		ID: raw.ID ?? index + 1,
+		NAME: name,
+		CATEGORY: category,
+		SRC: src,
+		optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
+		placeholderColor: placeholderColor,
+		// keep the original raw item available if needed
+		raw: raw,
 	};
 });
 ---
@@ -23,6 +72,7 @@ const processedData = galleryData.map(item => {
 					href={`/film/${item.ID}`}
 					class="archive-item"
 					data-image={item.optimizedSrc}
+					data-placeholder={item.placeholderColor}
 					data-name={item.NAME}
 				>
 					<span class="item-id">{item.ID}</span>
@@ -33,6 +83,7 @@ const processedData = galleryData.map(item => {
 		}
 	</div>
 	<div id="hover-image" class="hover-image">
+		<div class="placeholder-box"></div>
 		<img src="" alt="" />
 	</div>
 </div>
@@ -41,7 +92,7 @@ const processedData = galleryData.map(item => {
 	.archive-container {
 		width: 100%;
 		min-height: 100vh;
-		padding: 2rem 1rem;
+		padding: 4rem 1rem;
 		margin-top: 0;
 	}
 
@@ -52,12 +103,16 @@ const processedData = galleryData.map(item => {
 	.archive-item {
 		display: grid;
 		grid-template-columns: 80px 1fr 200px;
-		gap: 2rem;
-		margin: 0.5rem 0;
+		gap: 1rem;
+		/* margin: 0.5rem 0; */
 		text-decoration: none;
 		color: #000000;
 		font-family: var(--font-family);
-		transition: opacity 0.2s ease;
+		transition: transform 0.1s ease;
+	}
+
+	.archive-item:hover {
+		transform: translateX(20px);
 	}
 
 	.item-id {
@@ -68,7 +123,7 @@ const processedData = galleryData.map(item => {
 	.item-name {
 		font-size: var(--font-size);
 		font-weight: 600;
-		text-transform: uppercase;
+		/* text-transform: uppercase; */
 		letter-spacing: 0.02em;
 	}
 
@@ -85,7 +140,6 @@ const processedData = galleryData.map(item => {
 		opacity: 0;
 		transition: opacity 0.3s ease;
 		z-index: 1;
-		transform: translate(-50%, -50%);
 	}
 
 	.hover-image.visible {
@@ -93,10 +147,19 @@ const processedData = galleryData.map(item => {
 	}
 
 	.hover-image img {
-		width: 300px;
+		width: 150px;
 		height: auto;
 		display: block;
 		object-fit: cover;
+	}
+
+	.hover-image .placeholder-box {
+		width: 150px;
+		height: 112px;
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 
 	@media (max-width: 768px) {
@@ -117,7 +180,12 @@ const processedData = galleryData.map(item => {
 		}
 
 		.hover-image img {
-			width: 200px;
+			width: 100px;
+		}
+
+		.hover-image .placeholder-box {
+			width: 100px;
+			height: 75px;
 		}
 	}
 </style>
@@ -126,16 +194,47 @@ const processedData = galleryData.map(item => {
 	const archiveItems = document.querySelectorAll(".archive-item");
 	const hoverImage = document.getElementById("hover-image");
 	const hoverImg = hoverImage?.querySelector("img");
+	const placeholderBox = hoverImage?.querySelector(
+		".placeholder-box"
+	) as HTMLElement;
+
+	// Function to get random position within viewport
+	function getRandomPosition() {
+		const margin = 50; // Keep some margin from edges
+		const maxX = window.innerWidth - 150 - margin; // 150 is image width
+		const maxY = window.innerHeight - 112 - margin; // 112 is approx image height
+
+		const randomX = margin + Math.random() * maxX;
+		const randomY = margin + Math.random() * maxY;
+
+		return { x: randomX, y: randomY };
+	}
 
 	archiveItems.forEach(item => {
 		item.addEventListener("mouseenter", e => {
 			const target = e.currentTarget as HTMLElement;
 			const imageSrc = target.getAttribute("data-image");
+			const placeholderColor = target.getAttribute("data-placeholder");
 			const imageName = target.getAttribute("data-name");
 
-			if (hoverImage && hoverImg && imageSrc) {
-				hoverImg.src = imageSrc;
-				hoverImg.alt = imageName || "";
+			if (hoverImage) {
+				// Get random position
+				const pos = getRandomPosition();
+				hoverImage.style.left = pos.x + "px";
+				hoverImage.style.top = pos.y + "px";
+
+				if (imageSrc && hoverImg) {
+					// Show image
+					hoverImg.src = imageSrc;
+					hoverImg.alt = imageName || "";
+					hoverImg.style.display = "block";
+					if (placeholderBox) placeholderBox.style.display = "none";
+				} else if (placeholderColor && placeholderBox) {
+					// Show placeholder color
+					placeholderBox.style.backgroundColor = placeholderColor;
+					placeholderBox.style.display = "block";
+					if (hoverImg) hoverImg.style.display = "none";
+				}
 				hoverImage.classList.add("visible");
 			}
 		});
@@ -143,14 +242,6 @@ const processedData = galleryData.map(item => {
 		item.addEventListener("mouseleave", () => {
 			if (hoverImage) {
 				hoverImage.classList.remove("visible");
-			}
-		});
-
-		item.addEventListener("mousemove", e => {
-			const mouseEvent = e as MouseEvent;
-			if (hoverImage) {
-				hoverImage.style.left = mouseEvent.clientX + "px";
-				hoverImage.style.top = mouseEvent.clientY + "px";
 			}
 		});
 	});

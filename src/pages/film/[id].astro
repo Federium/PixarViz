@@ -1,16 +1,79 @@
 ---
-import filmData from "../../data/pixarviz_page.json";
+import rawData from "../../data/pixar_archivio.json";
 
 interface Film {
 	ID: number;
 	TITLE: string;
-	YEAR: number;
+	YEAR: number | null;
 	SRC: string;
+	optimizedSrc: string;
+	placeholderColor: string | null;
 	TECHNIQUE: string | null;
+	DESCRIPTION: string | null;
+	CATEGORY: string;
+	DIRECTOR: string | null;
+	PLOT: string | null;
 }
 
 export async function getStaticPaths() {
-	// Usa i dati dal file JSON locale
+	// Generate random color for placeholder
+	const getRandomColor = (seed: number): string => {
+		const colors = [
+			"#FF6B6B",
+			"#4ECDC4",
+			"#45B7D1",
+			"#FFA07A",
+			"#98D8C8",
+			"#F7DC6F",
+			"#BB8FCE",
+			"#85C1E2",
+			"#F8B195",
+			"#6C5CE7",
+			"#A8E6CF",
+			"#FFD3B6",
+			"#FFAAA5",
+			"#FF8B94",
+			"#C7CEEA",
+		];
+		return colors[seed % colors.length];
+	};
+
+	const filmData = rawData.map((item, index) => {
+		const raw: any = item;
+		const name =
+			raw["Film/corto"] || raw["Personaggio/soggetto"] || `Film ${index + 1}`;
+
+		// Prefer Copertina, otherwise look for first ImgXX
+		let src = raw.Copertina || "";
+		if (!src) {
+			for (let i = 1; i <= 10; i++) {
+				const key = `Img${String(i).padStart(2, "0")}`;
+				if (raw[key]) {
+					src = raw[key];
+					break;
+				}
+			}
+		}
+
+		const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
+		const filename = src ? src.split("/").pop() || "" : "";
+		const nameWithoutExt = filename.replace(extPattern, "");
+
+		return {
+			ID: raw.ID ?? index + 1,
+			TITLE: name,
+			YEAR: raw.Anno || null,
+			SRC: src,
+			optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
+			placeholderColor: !src ? getRandomColor(index) : null,
+			TECHNIQUE: raw["Nome Innovazione"] || null,
+			DESCRIPTION: raw["Paragrafo descrizione innovazione"] || null,
+			CATEGORY: raw["Categoria Innovazione (tag)"] || "",
+			DIRECTOR: raw["Regista/autore"] || null,
+			PLOT: raw.Trama || null,
+		};
+	});
+
 	return filmData.map((film: Film) => ({
 		params: { id: film.ID.toString() },
 		props: { film },
@@ -22,12 +85,6 @@ interface Props {
 }
 
 const { film } = Astro.props as Props;
-
-// Usa le immagini WebP ottimizzate dalla cartella public
-const filename = film.SRC.split("/").pop() || "";
-const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
-const nameWithoutExt = filename.replace(extPattern, "");
-const optimizedSrc = `/images/${nameWithoutExt}.webp`;
 
 import "../../styles/style.css";
 import "../../styles/film-detail.css";
@@ -55,23 +112,44 @@ import Footer from "../../components/Footer.astro";
 		<div class="film-detail">
 			<div class="film-content">
 				<div class="film-image">
-					<img
-						src={optimizedSrc}
-						alt={film.TITLE}
-						loading="eager"
-						width="800"
-						height="600"
-					/>
+					{
+						film.optimizedSrc ? (
+							<img
+								src={film.optimizedSrc}
+								alt={film.TITLE}
+								loading="eager"
+								width="800"
+								height="600"
+							/>
+						) : film.placeholderColor ? (
+							<div
+								class="placeholder-image"
+								style={`background-color: ${film.placeholderColor};`}
+							/>
+						) : null
+					}
 				</div>
 
 				<div class="film-info">
 					<h1>{film.TITLE}</h1>
-					<p class="year">Anno: {film.YEAR}</p>
+					{film.YEAR && <p class="year">Anno: {film.YEAR}</p>}
+					{film.DIRECTOR && <p class="director">Regia: {film.DIRECTOR}</p>}
+					{film.CATEGORY && <p class="category">Categoria: {film.CATEGORY}</p>}
+
+					{
+						film.PLOT && (
+							<div class="plot">
+								<h2>Trama</h2>
+								<p>{film.PLOT}</p>
+							</div>
+						)
+					}
+
 					{
 						film.TECHNIQUE && (
 							<div class="technique">
-								<h2>Tecnica</h2>
-								<p>{film.TECHNIQUE}</p>
+								<h2>Innovazione: {film.TECHNIQUE}</h2>
+								{film.DESCRIPTION && <p>{film.DESCRIPTION}</p>}
 							</div>
 						)
 					}
