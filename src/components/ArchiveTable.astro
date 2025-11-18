@@ -27,9 +27,13 @@ function getRandomColor(seed: number): string {
 
 const processedData = galleryData.map((item, index) => {
 	const raw: any = item;
-	// New JSON uses Italian keys. Normalize into the shape the components expect.
-	const name = raw["Film/corto"] || raw["Personaggio/soggetto"] || "Untitled";
+	// New JSON uses Italian keys. Extract all needed columns.
+	const id = raw.ID ?? index + 1;
+	const personaggio = raw["Personaggio/soggetto"] || "";
+	const film = raw["Film/corto"] || "";
+	const anno = raw.Anno || "";
 	const category = raw["Categoria Innovazione (tag)"] || "";
+	const nomeInnovazione = raw["Nome Innovazione"] || "";
 
 	// Prefer `Copertina` if present, otherwise look for the first ImgXX field
 	let src = raw.Copertina || "";
@@ -51,10 +55,12 @@ const processedData = galleryData.map((item, index) => {
 	const placeholderColor = !src ? getRandomColor(index) : null;
 
 	return {
-		// Ensure there is an ID for routing (use index+1 when missing)
-		ID: raw.ID ?? index + 1,
-		NAME: name,
+		ID: id,
+		PERSONAGGIO: personaggio,
+		FILM: film,
+		ANNO: anno,
 		CATEGORY: category,
+		NOME_INNOVAZIONE: nomeInnovazione,
 		SRC: src,
 		optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
 		placeholderColor: placeholderColor,
@@ -65,6 +71,14 @@ const processedData = galleryData.map((item, index) => {
 ---
 
 <div class="archive-container">
+	<div class="archive-header">
+		<span class="header-id">ID</span>
+		<span class="header-personaggio">Personaggio</span>
+		<span class="header-film">Film</span>
+		<span class="header-anno">Anno</span>
+		<span class="header-category">Categoria Innovazione</span>
+		<span class="header-innovation">Nome Innovazione</span>
+	</div>
 	<div class="archive-list">
 		{
 			processedData.map(item => (
@@ -73,11 +87,14 @@ const processedData = galleryData.map((item, index) => {
 					class="archive-item"
 					data-image={item.optimizedSrc}
 					data-placeholder={item.placeholderColor}
-					data-name={item.NAME}
+					data-name={item.PERSONAGGIO || item.FILM}
 				>
-					<span class="item-id">{item.ID}</span>
-					<span class="item-name">{item.NAME}</span>
+					<span class="item-id">[{String(item.ID).padStart(2, "0")}]</span>
+					<span class="item-personaggio">{item.PERSONAGGIO}</span>
+					<span class="item-film">{item.FILM}</span>
+					<span class="item-anno">{item.ANNO}</span>
 					<span class="item-category">{item.CATEGORY}</span>
+					<span class="item-innovation">{item.NOME_INNOVAZIONE}</span>
 				</a>
 			))
 		}
@@ -100,11 +117,31 @@ const processedData = galleryData.map((item, index) => {
 		width: 100%;
 	}
 
+	.archive-header {
+		display: grid;
+		grid-template-columns: 60px 1fr 1fr 80px 200px 1fr;
+		gap: 1rem;
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		font-weight: 400;
+		margin-bottom: 1rem;
+		padding-bottom: 0.5rem;
+	}
+
+	.header-id,
+	.header-personaggio,
+	.header-film,
+	.header-anno,
+	.header-category,
+	.header-innovation {
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
 	.archive-item {
 		display: grid;
-		grid-template-columns: 80px 1fr 200px;
+		grid-template-columns: 60px 1fr 1fr 80px 200px 1fr;
 		gap: 1rem;
-		/* margin: 0.5rem 0; */
 		text-decoration: none;
 		color: #000000;
 		font-family: var(--font-family);
@@ -117,20 +154,32 @@ const processedData = galleryData.map((item, index) => {
 
 	.item-id {
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: 400;
 	}
 
-	.item-name {
+	.item-personaggio,
+	.item-film {
 		font-size: var(--font-size);
-		font-weight: 600;
-		/* text-transform: uppercase; */
+		font-weight: 400;
 		letter-spacing: 0.02em;
+	}
+
+	.item-anno {
+		font-size: var(--font-size);
+		font-weight: 400;
+		text-align: left;
 	}
 
 	.item-category {
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: 400;
 		text-transform: capitalize;
+		text-align: left;
+	}
+
+	.item-innovation {
+		font-size: var(--font-size);
+		font-weight: 400;
 		text-align: left;
 	}
 
@@ -167,15 +216,25 @@ const processedData = galleryData.map((item, index) => {
 			padding: 3rem 1rem 2rem 1rem;
 		}
 
+		.archive-header {
+			grid-template-columns: 40px 1fr 1fr 60px 120px 1fr;
+			gap: 0.5rem;
+			font-size: 0.65rem;
+			margin-bottom: 0.5rem;
+		}
+
 		.archive-item {
-			grid-template-columns: 60px 1fr 120px;
-			gap: 1rem;
+			grid-template-columns: 40px 1fr 1fr 60px 120px 1fr;
+			gap: 0.5rem;
 			padding: 0.4rem 0;
 		}
 
 		.item-id,
-		.item-name,
-		.item-category {
+		.item-personaggio,
+		.item-film,
+		.item-anno,
+		.item-category,
+		.item-innovation {
 			font-size: 0.7rem;
 		}
 
