@@ -28,8 +28,10 @@ function getRandomColor(seed: number): string {
 // Prepara i dati con percorsi ottimizzati per WebP
 const processedData = galleryData.map((item, index) => {
 	const raw: any = item;
-	const name =
-		raw["Film/corto"] || raw["Personaggio/soggetto"] || `Film ${index + 1}`;
+	const personaggio = raw["Personaggio/soggetto"] || "";
+	const film = raw["Film/corto"] || "";
+	const anno = raw.Anno || "";
+	const innovazione = raw["Nome Innovazione"] || "";
 	const category = raw["Categoria Innovazione (tag)"] || "";
 
 	// Prefer `Copertina` if present, otherwise fall back to first ImgXX
@@ -53,7 +55,10 @@ const processedData = galleryData.map((item, index) => {
 
 	return {
 		ID: raw.ID ?? index + 1,
-		NAME: name,
+		PERSONAGGIO: personaggio,
+		FILM: film,
+		ANNO: anno,
+		INNOVAZIONE: innovazione,
 		CATEGORY: category,
 		SRC: src,
 		optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
@@ -65,9 +70,12 @@ const processedData = galleryData.map((item, index) => {
 
 <div id="canvas-container" data-gallery={JSON.stringify(processedData)}></div>
 <div id="image-info">
-	<div id="image-name"></div>
-	<div id="image-category"></div>
-	<div id="image-id"></div>
+	<div id="image-personaggio"></div>
+	<div class="image-details">
+		<div id="image-film"></div>
+		<div id="image-innovazione"></div>
+		<div id="image-anno"></div>
+	</div>
 </div>
 
 <script>
@@ -205,8 +213,10 @@ const processedData = galleryData.map((item, index) => {
 				// Aggiungi metadata per riferimento
 				mesh.userData = {
 					id: item.ID,
-					name: item.NAME,
-					category: item.CATEGORY,
+					personaggio: item.PERSONAGGIO,
+					film: item.FILM,
+					anno: item.ANNO,
+					innovazione: item.INNOVAZIONE,
 				};
 
 				scene.add(mesh);
@@ -240,11 +250,12 @@ const processedData = galleryData.map((item, index) => {
 	const mouse = new THREE.Vector2();
 	let hoveredImage: THREE.Mesh | null = null;
 
-	// Elemento per mostrare il titolo
+	// Elemento per mostrare le info
 	const titleElement = document.getElementById("image-info");
-	const nameElement = document.getElementById("image-name");
-	const categoryElement = document.getElementById("image-category");
-	const idElement = document.getElementById("image-id");
+	const personaggioElement = document.getElementById("image-personaggio");
+	const filmElement = document.getElementById("image-film");
+	const innovazioneElement = document.getElementById("image-innovazione");
+	const annoElement = document.getElementById("image-anno");
 
 	// Event listener per il mouse
 	window.addEventListener("mousemove", event => {
@@ -263,14 +274,14 @@ const processedData = galleryData.map((item, index) => {
 		// Mostra/nascondi le info
 		if (intersects.length > 0 && titleElement) {
 			const hoveredMesh = intersects[0].object as THREE.Mesh;
-			if (nameElement) nameElement.textContent = hoveredMesh.userData.name;
-			if (categoryElement) {
-				const category = hoveredMesh.userData.category;
-				const capitalizedCategory =
-					category.charAt(0).toUpperCase() + category.slice(1);
-				categoryElement.textContent = `Category: ${capitalizedCategory}`;
-			}
-			if (idElement) idElement.textContent = `ID: ${hoveredMesh.userData.id}`;
+			if (personaggioElement)
+				personaggioElement.textContent = hoveredMesh.userData.personaggio;
+			if (filmElement)
+				filmElement.textContent = `Film: ${hoveredMesh.userData.film}`;
+			if (innovazioneElement)
+				innovazioneElement.textContent = `Innovazione: ${hoveredMesh.userData.innovazione}`;
+			if (annoElement)
+				annoElement.textContent = `Anno: ${hoveredMesh.userData.anno}`;
 			titleElement.classList.add("visible");
 		} else if (titleElement) {
 			titleElement.classList.remove("visible");
