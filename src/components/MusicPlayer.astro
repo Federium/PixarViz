@@ -1,0 +1,595 @@
+---
+// MusicPlayer component - Minimal and typographic music player
+const musicFiles = [
+	{
+		name: "You've Got a Friend in Me",
+		artist: "Randy Newman",
+		film: "Toy Story",
+		src: "/src/assets/Music/Randy Newman (Toy Story) - You Got A Friend In Me.mp3",
+	},
+	{
+		name: "You've Got a Friend in Me",
+		artist: "Randy Newman",
+		film: "Toy Story",
+		src: "/src/assets/Music/Randy Newman - You've Got a Friend in Me (From Toy Story).mp3",
+	},
+	{
+		name: "If I Didn't Have You",
+		artist: "Billy Crystal & John Goodman",
+		film: "Monsters Inc.",
+		src: "/src/assets/Music/Billy Crystal & John Goodman (Monsters Inc.) - If I Didn't Have You.mp3",
+	},
+	{
+		name: "Le Festin",
+		artist: "Camille",
+		film: "Ratatouille",
+		src: "/src/assets/Music/Camille (Ratatouille) - Le Festin.mp3",
+	},
+	{
+		name: "Down to Earth",
+		artist: "Peter Gabriel",
+		film: "WALL-E",
+		src: "/src/assets/Music/Peter Gabriel (WALL-E) - Down to Earth.mp3",
+	},
+	{
+		name: "When She Loved Me",
+		artist: "Sarah McLachlan",
+		film: "Toy Story 2",
+		src: "/src/assets/Music/When She Loved Me - Sarah McLachlan (Toy Story 2).mp3",
+	},
+	{
+		name: "Life is A Highway",
+		artist: "Rascal Flatts",
+		film: "Cars",
+		src: "/src/assets/Music/Rascal Flatts (Cars) - Life is A Highway.mp3",
+	},
+	{
+		name: "Real Gone",
+		artist: "Sheryl Crow",
+		film: "Cars",
+		src: "/src/assets/Music/Sheryl Crow (Cars) - Real Gone.mp3",
+	},
+	{
+		name: "Our Town",
+		artist: "James Taylor",
+		film: "Cars",
+		src: "/src/assets/Music/James Taylor - Our Town.mp3",
+	},
+	{
+		name: "The Time of Your Life",
+		artist: "Randy Newman",
+		film: "A Bug's Life",
+		src: "/src/assets/Music/Randy Newman (A Bug's Life) - The Time of Your Life.mp3",
+	},
+	{
+		name: "Carl Goes Up",
+		artist: "Soundtrack",
+		film: "Up",
+		src: "/src/assets/Music/Carl Goes Up (From Up).mp3",
+	},
+	{
+		name: "Colette Shows Him Le Ropes",
+		artist: "Soundtrack",
+		film: "Ratatouille",
+		src: "/src/assets/Music/Colette Shows Him Le Ropes (From Ratotuille).mp3",
+	},
+	{
+		name: "Dancing Define",
+		artist: "Soundtrack",
+		film: "WALL-E",
+		src: "/src/assets/Music/Dancing Define (From Wall-E).mp3",
+	},
+	{
+		name: "First Date",
+		artist: "Soundtrack",
+		film: "WALL-E",
+		src: "/src/assets/Music/First Date (From Wall-E).mp3",
+	},
+	{
+		name: "First Day",
+		artist: "Soundtrack",
+		film: "Finding Nemo",
+		src: "/src/assets/Music/First Day (From Finding Nemo).mp3",
+	},
+	{
+		name: "Infinity and Beyond",
+		artist: "Soundtrack",
+		film: "Toy Story",
+		src: "/src/assets/Music/Infinity and Beyond (From Toy Story).mp3",
+	},
+	{
+		name: "McQueen and Sally",
+		artist: "Soundtrack",
+		film: "Cars",
+		src: "/src/assets/Music/McQueen and Sally (From Cars).mp3",
+	},
+	{
+		name: "Monsters Inc.",
+		artist: "Soundtrack",
+		film: "Monsters Inc.",
+		src: "/src/assets/Music/Monsters Inc. (From Monsters Inc.).mp3",
+	},
+	{
+		name: "Nemo Egg",
+		artist: "Soundtrack",
+		film: "Finding Nemo",
+		src: "/src/assets/Music/Nemo Egg (From Finding Nemo).mp3",
+	},
+	{
+		name: "Suite",
+		artist: "Soundtrack",
+		film: "A Bug's Life",
+		src: "/src/assets/Music/Suite (From a Bug's Life).mp3",
+	},
+	{
+		name: "The Cleaner",
+		artist: "Soundtrack",
+		film: "Toy Story 2",
+		src: "/src/assets/Music/The Cleaner (From Toy Story 2).mp3",
+	},
+	{
+		name: "The Flik Machine",
+		artist: "Soundtrack",
+		film: "A Bug's Life",
+		src: "/src/assets/Music/The Flik Machine (From A Bug's Life).mp3",
+	},
+	{
+		name: "The Incredits",
+		artist: "Soundtrack",
+		film: "The Incredibles",
+		src: "/src/assets/Music/The Incredits (From the Incredibles).mp3",
+	},
+	{
+		name: "The Scare Floor",
+		artist: "Soundtrack",
+		film: "Monsters Inc.",
+		src: "/src/assets/Music/The Scare Floor (From Monsters Inc.).mp3",
+	},
+	{
+		name: "Wall Rat",
+		artist: "Soundtrack",
+		film: "Ratatouille",
+		src: "/src/assets/Music/Wall Rat (From Ratatouille).mp3",
+	},
+];
+---
+
+<div id="music-player">
+	<div class="player-left">
+		<span id="track-name">—</span>
+		<span id="music-indicator" class="music-indicator">
+			<span class="bar"></span>
+			<span class="bar"></span>
+			<span class="bar"></span>
+		</span>
+	</div>
+
+	<div class="player-center">
+		<button id="prev-btn" class="control-btn" aria-label="Previous track"
+			>|◀</button
+		>
+		<button id="play-pause-btn" class="control-btn play-pause" aria-label="Play"
+			>▶</button
+		>
+		<button id="next-btn" class="control-btn" aria-label="Next track"
+			>▶|</button
+		>
+	</div>
+
+	<div class="player-right">
+		<button id="volume-btn" class="control-btn" aria-label="Volume"
+			>● Volume</button
+		>
+	</div>
+
+	<audio id="audio-element"></audio>
+</div>
+
+<style>
+	#music-player {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		width: 100vw;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem 1rem;
+		z-index: 1000;
+		pointer-events: auto;
+		background: transparent;
+	}
+
+	.player-left,
+	.player-center,
+	.player-right {
+		flex: 1;
+		display: flex;
+		align-items: center;
+	}
+
+	.player-left {
+		justify-content: flex-start;
+		gap: 0.5rem;
+	}
+
+	.music-indicator {
+		display: flex;
+		align-items: flex-end;
+		gap: 2px;
+		height: 12px;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+
+	.music-indicator.playing {
+		opacity: 1;
+	}
+
+	.music-indicator .bar {
+		width: 2px;
+		background-color: #000000;
+		mix-blend-mode: difference;
+		animation: wave 0.8s ease-in-out infinite;
+	}
+
+	.music-indicator .bar:nth-child(1) {
+		height: 4px;
+		animation-delay: 0s;
+	}
+
+	.music-indicator .bar:nth-child(2) {
+		height: 8px;
+		animation-delay: 0.2s;
+	}
+
+	.music-indicator .bar:nth-child(3) {
+		height: 6px;
+		animation-delay: 0.4s;
+	}
+
+	@keyframes wave {
+		0%,
+		100% {
+			transform: scaleY(0.5);
+		}
+		50% {
+			transform: scaleY(1);
+		}
+	}
+
+	.player-center {
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.player-right {
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+
+	#track-name {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		font-weight: 600;
+		color: #000000;
+		mix-blend-mode: difference;
+		user-select: none;
+	}
+
+	.control-btn {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		font-weight: 600;
+		color: #000000;
+		background: none;
+		border: none;
+		padding: 0.25rem 0rem;
+		mix-blend-mode: difference;
+		transition: opacity 0.2s ease;
+	}
+
+	.control-btn:hover {
+		opacity: 0.6;
+	}
+
+	.play-pause {
+		font-size: var(--font-size);
+		padding: 0.25rem 0.75rem;
+	}
+
+	#prev-btn,
+	#next-btn {
+		font-size: var(--font-size);
+		line-height: 1;
+	}
+
+	#volume-btn {
+		font-size: var(--font-size);
+	}
+
+	@media (max-width: 768px) {
+		#music-player {
+			padding: 1rem;
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+
+		.player-left,
+		.player-center,
+		.player-right {
+			flex: none;
+			width: 100%;
+		}
+
+		.player-left {
+			order: -1;
+			justify-content: center;
+		}
+
+		.player-right {
+			justify-content: center;
+		}
+	}
+</style>
+
+<script>
+	const musicFiles = [
+		{
+			name: "You've Got a Friend in Me",
+			artist: "Randy Newman",
+			film: "Toy Story",
+			src: "/src/assets/Music/Randy Newman (Toy Story) - You Got A Friend In Me.mp3",
+		},
+		{
+			name: "You've Got a Friend in Me",
+			artist: "Randy Newman",
+			film: "Toy Story",
+			src: "/src/assets/Music/Randy Newman - You've Got a Friend in Me (From Toy Story).mp3",
+		},
+		{
+			name: "If I Didn't Have You",
+			artist: "Billy Crystal & John Goodman",
+			film: "Monsters Inc.",
+			src: "/src/assets/Music/Billy Crystal & John Goodman (Monsters Inc.) - If I Didn't Have You.mp3",
+		},
+		{
+			name: "Le Festin",
+			artist: "Camille",
+			film: "Ratatouille",
+			src: "/src/assets/Music/Camille (Ratatouille) - Le Festin.mp3",
+		},
+		{
+			name: "Down to Earth",
+			artist: "Peter Gabriel",
+			film: "WALL-E",
+			src: "/src/assets/Music/Peter Gabriel (WALL-E) - Down to Earth.mp3",
+		},
+		{
+			name: "When She Loved Me",
+			artist: "Sarah McLachlan",
+			film: "Toy Story 2",
+			src: "/src/assets/Music/When She Loved Me - Sarah McLachlan (Toy Story 2).mp3",
+		},
+		{
+			name: "Life is A Highway",
+			artist: "Rascal Flatts",
+			film: "Cars",
+			src: "/src/assets/Music/Rascal Flatts (Cars) - Life is A Highway.mp3",
+		},
+		{
+			name: "Real Gone",
+			artist: "Sheryl Crow",
+			film: "Cars",
+			src: "/src/assets/Music/Sheryl Crow (Cars) - Real Gone.mp3",
+		},
+		{
+			name: "Our Town",
+			artist: "James Taylor",
+			film: "Cars",
+			src: "/src/assets/Music/James Taylor - Our Town.mp3",
+		},
+		{
+			name: "The Time of Your Life",
+			artist: "Randy Newman",
+			film: "A Bug's Life",
+			src: "/src/assets/Music/Randy Newman (A Bug's Life) - The Time of Your Life.mp3",
+		},
+		{
+			name: "Carl Goes Up",
+			artist: "Soundtrack",
+			film: "Up",
+			src: "/src/assets/Music/Carl Goes Up (From Up).mp3",
+		},
+		{
+			name: "Colette Shows Him Le Ropes",
+			artist: "Soundtrack",
+			film: "Ratatouille",
+			src: "/src/assets/Music/Colette Shows Him Le Ropes (From Ratotuille).mp3",
+		},
+		{
+			name: "Dancing Define",
+			artist: "Soundtrack",
+			film: "WALL-E",
+			src: "/src/assets/Music/Dancing Define (From Wall-E).mp3",
+		},
+		{
+			name: "First Date",
+			artist: "Soundtrack",
+			film: "WALL-E",
+			src: "/src/assets/Music/First Date (From Wall-E).mp3",
+		},
+		{
+			name: "First Day",
+			artist: "Soundtrack",
+			film: "Finding Nemo",
+			src: "/src/assets/Music/First Day (From Finding Nemo).mp3",
+		},
+		{
+			name: "Infinity and Beyond",
+			artist: "Soundtrack",
+			film: "Toy Story",
+			src: "/src/assets/Music/Infinity and Beyond (From Toy Story).mp3",
+		},
+		{
+			name: "McQueen and Sally",
+			artist: "Soundtrack",
+			film: "Cars",
+			src: "/src/assets/Music/McQueen and Sally (From Cars).mp3",
+		},
+		{
+			name: "Monsters Inc.",
+			artist: "Soundtrack",
+			film: "Monsters Inc.",
+			src: "/src/assets/Music/Monsters Inc. (From Monsters Inc.).mp3",
+		},
+		{
+			name: "Nemo Egg",
+			artist: "Soundtrack",
+			film: "Finding Nemo",
+			src: "/src/assets/Music/Nemo Egg (From Finding Nemo).mp3",
+		},
+		{
+			name: "Suite",
+			artist: "Soundtrack",
+			film: "A Bug's Life",
+			src: "/src/assets/Music/Suite (From a Bug's Life).mp3",
+		},
+		{
+			name: "The Cleaner",
+			artist: "Soundtrack",
+			film: "Toy Story 2",
+			src: "/src/assets/Music/The Cleaner (From Toy Story 2).mp3",
+		},
+		{
+			name: "The Flik Machine",
+			artist: "Soundtrack",
+			film: "A Bug's Life",
+			src: "/src/assets/Music/The Flik Machine (From A Bug's Life).mp3",
+		},
+		{
+			name: "The Incredits",
+			artist: "Soundtrack",
+			film: "The Incredibles",
+			src: "/src/assets/Music/The Incredits (From the Incredibles).mp3",
+		},
+		{
+			name: "The Scare Floor",
+			artist: "Soundtrack",
+			film: "Monsters Inc.",
+			src: "/src/assets/Music/The Scare Floor (From Monsters Inc.).mp3",
+		},
+		{
+			name: "Wall Rat",
+			artist: "Soundtrack",
+			film: "Ratatouille",
+			src: "/src/assets/Music/Wall Rat (From Ratatouille).mp3",
+		},
+	];
+
+	let currentTrackIndex = 0;
+	let isMuted = false;
+	const defaultVolume = 0.66; // Volume predefinito al 66%
+
+	const audio = document.getElementById("audio-element") as HTMLAudioElement;
+	const trackName = document.getElementById("track-name");
+	const playPauseBtn = document.getElementById("play-pause-btn");
+	const prevBtn = document.getElementById("prev-btn");
+	const nextBtn = document.getElementById("next-btn");
+	const volumeBtn = document.getElementById("volume-btn");
+	const musicIndicator = document.getElementById("music-indicator");
+
+	// Carica la traccia corrente
+	function loadTrack(index: number) {
+		if (index < 0 || index >= musicFiles.length) return;
+
+		const track = musicFiles[index];
+		audio.src = track.src;
+		if (trackName) {
+			trackName.textContent = `${track.name} — ${track.artist} [${track.film}]`;
+		}
+		audio.volume = isMuted ? 0 : defaultVolume;
+	}
+
+	// Aggiorna l'icona del volume
+	function updateVolumeIcon() {
+		if (volumeBtn) {
+			volumeBtn.textContent = isMuted ? "○ Volume" : "● Volume";
+		}
+	}
+
+	// Play/Pause
+	playPauseBtn?.addEventListener("click", () => {
+		if (audio.paused) {
+			audio.play();
+			playPauseBtn.textContent = "■";
+			playPauseBtn.setAttribute("aria-label", "Pause");
+			musicIndicator?.classList.add("playing");
+		} else {
+			audio.pause();
+			playPauseBtn.textContent = "▶";
+			playPauseBtn.setAttribute("aria-label", "Play");
+			musicIndicator?.classList.remove("playing");
+		}
+	});
+
+	// Previous track
+	prevBtn?.addEventListener("click", () => {
+		const wasPlaying = !audio.paused;
+		currentTrackIndex =
+			(currentTrackIndex - 1 + musicFiles.length) % musicFiles.length;
+		loadTrack(currentTrackIndex);
+		if (wasPlaying) {
+			audio.play();
+		}
+	});
+
+	// Next track
+	nextBtn?.addEventListener("click", () => {
+		const wasPlaying = !audio.paused;
+		currentTrackIndex = (currentTrackIndex + 1) % musicFiles.length;
+		loadTrack(currentTrackIndex);
+		if (wasPlaying) {
+			audio.play();
+		}
+	});
+
+	// Auto-play next track quando finisce
+	audio.addEventListener("ended", () => {
+		currentTrackIndex = (currentTrackIndex + 1) % musicFiles.length;
+		loadTrack(currentTrackIndex);
+		audio.play();
+	});
+
+	// Volume control - toggle mute/unmute
+	volumeBtn?.addEventListener("click", () => {
+		isMuted = !isMuted;
+		audio.volume = isMuted ? 0 : defaultVolume;
+		updateVolumeIcon();
+	});
+
+	// Carica la prima traccia e avvia la riproduzione
+	loadTrack(currentTrackIndex);
+	updateVolumeIcon();
+
+	// Auto-play al caricamento
+	audio.addEventListener(
+		"canplaythrough",
+		() => {
+			audio
+				.play()
+				.then(() => {
+					if (playPauseBtn) {
+						playPauseBtn.textContent = "■";
+						playPauseBtn.setAttribute("aria-label", "Pause");
+					}
+					musicIndicator?.classList.add("playing");
+				})
+				.catch(err => {
+					console.log("Auto-play bloccato dal browser:", err);
+				});
+		},
+		{ once: true }
+	);
+</script>
