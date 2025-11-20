@@ -69,13 +69,25 @@
 	padding: 0;
 	box-sizing: border-box;
 	cursor: url('/src/assets/Background/maria_grazia_mattei2 copy.png'), auto;
+	mix-blend-mode: difference;
 }
 
 body {
 	width: 100vw;
 	height: 100vh;
-	background: #ffffff;
+	background: #000000;
 	font-family: var(--font-family);
+}
+
+body::before {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: #ffffff;
+	z-index: -1;
 }
 
 /* Custom cursor */
