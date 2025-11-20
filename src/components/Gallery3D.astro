@@ -2,6 +2,7 @@
 // Carica i dati dal file JSON locale
 import galleryData from "../data/pixar_archivio.json";
 import "../styles/gallery3d.css";
+import "../styles/filters.css";
 
 // Generate random color for placeholder
 function getRandomColor(seed: number): string {
@@ -78,6 +79,39 @@ const processedData = galleryData.map((item, index) => {
 	</div>
 </div>
 
+<!-- Filtri per categoria -->
+<div id="category-filters">
+	<button id="toggle-filters" class="filter-main-button">
+		<span>Innovazione</span>
+		<svg
+			class="arrow-icon"
+			width="12"
+			height="12"
+			viewBox="0 0 12 12"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
+			<path
+				d="M2 4L6 8L10 4"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"></path>
+		</svg>
+	</button>
+	<div id="filter-options-container" class="filter-options-container hidden">
+		<button class="filter-button active" data-category="all">Tutte</button>
+		<button class="filter-button" data-category="Movimento">Movimento</button>
+		<button class="filter-button" data-category="Luci">Luci</button>
+		<button class="filter-button" data-category="Modellazione"
+			>Modellazione</button
+		>
+		<button class="filter-button" data-category="Texture">Texture</button>
+		<button class="filter-button" data-category="Sfondo">Sfondo</button>
+		<button class="filter-button" data-category="Materiale">Materiale</button>
+	</div>
+</div>
+
 <script>
 	import * as THREE from "three";
 
@@ -124,6 +158,8 @@ const processedData = galleryData.map((item, index) => {
 		originalZ: number;
 		currentZ: number;
 		delay: number;
+		category: string;
+		isVisible: boolean;
 	}[] = [];
 
 	// TextureLoader
@@ -217,6 +253,7 @@ const processedData = galleryData.map((item, index) => {
 					film: item.FILM,
 					anno: item.ANNO,
 					innovazione: item.INNOVAZIONE,
+					category: item.CATEGORY,
 				};
 
 				scene.add(mesh);
@@ -235,6 +272,8 @@ const processedData = galleryData.map((item, index) => {
 					originalZ: finalZ,
 					currentZ: startZ,
 					delay: delay,
+					category: item.CATEGORY || "",
+					isVisible: true,
 				});
 			});
 		} catch (error) {
@@ -244,6 +283,74 @@ const processedData = galleryData.map((item, index) => {
 
 	// Carica le immagini
 	loadImages();
+
+	// Gestione filtri per categoria
+	function applyFilter(selectedCategory: string) {
+		imageData.forEach(data => {
+			const category = data.category || "";
+			const shouldBeVisible =
+				selectedCategory === "all" || category.includes(selectedCategory);
+
+			const material = data.mesh.material as THREE.MeshBasicMaterial;
+
+			if (shouldBeVisible && !data.isVisible) {
+				// Mostra l'immagine con fade in
+				data.mesh.visible = true;
+				data.isVisible = true;
+				material.opacity = 0;
+				const fadeIn = () => {
+					if (material.opacity < 1) {
+						material.opacity += 0.08;
+						requestAnimationFrame(fadeIn);
+					} else {
+						material.opacity = 1;
+					}
+				};
+				fadeIn();
+			} else if (!shouldBeVisible && data.isVisible) {
+				// Nascondi l'immagine con fade out
+				const fadeOut = () => {
+					if (material.opacity > 0) {
+						material.opacity -= 0.08;
+						requestAnimationFrame(fadeOut);
+					} else {
+						data.mesh.visible = false;
+						data.isVisible = false;
+					}
+				};
+				fadeOut();
+			}
+		});
+	}
+
+	// Event listener per i radio button
+	const toggleButton = document.getElementById("toggle-filters");
+	const optionsContainer = document.getElementById("filter-options-container");
+	const filterButtons = document.querySelectorAll(".filter-button");
+
+	// Toggle del menu filtri
+	toggleButton?.addEventListener("click", () => {
+		optionsContainer?.classList.toggle("hidden");
+		toggleButton.classList.toggle("open");
+	});
+
+	// Gestione click sui filtri
+	filterButtons.forEach(button => {
+		button.addEventListener("click", e => {
+			const target = e.currentTarget as HTMLElement;
+			const category = target.getAttribute("data-category");
+
+			// Rimuovi active da tutti
+			filterButtons.forEach(btn => btn.classList.remove("active"));
+			// Aggiungi active al button cliccato
+			target.classList.add("active");
+
+			// Applica il filtro
+			if (category) {
+				applyFilter(category);
+			}
+		});
+	});
 
 	// Raycaster per il hover
 	const raycaster = new THREE.Raycaster();
@@ -263,7 +370,9 @@ const processedData = galleryData.map((item, index) => {
 		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
 		raycaster.setFromCamera(mouse, camera);
-		const intersects = raycaster.intersectObjects(images);
+		// Filtra solo le immagini visibili
+		const visibleImages = images.filter(img => img.visible);
+		const intersects = raycaster.intersectObjects(visibleImages);
 
 		// Dispatch custom event per il cursore personalizzato
 		const isHovering = intersects.length > 0;
@@ -289,29 +398,34 @@ const processedData = galleryData.map((item, index) => {
 
 		// Prima resetta tutte le immagini
 		imageData.forEach(data => {
-			data.targetY = data.originalY;
+			if (data.isVisible) {
+				data.targetY = data.originalY;
+			}
 		});
 
 		// Poi crea l'effetto onda
 		hoveredImage = null;
 		if (intersects.length > 0) {
 			hoveredImage = intersects[0].object as THREE.Mesh;
-			const hoveredIndex = images.indexOf(hoveredImage);
+			// Trova l'indice nell'array delle immagini visibili
+			const visibleData = imageData.filter(d => d.isVisible);
+			const hoveredIndex = visibleData.findIndex(d => d.mesh === hoveredImage);
 
 			if (hoveredIndex !== -1) {
 				// Parametri per l'effetto onda
 				const maxLift = 1;
 				const waveRange = 1;
 
-				// Applica l'effetto a tutte le immagini nell'intervallo
-				for (let i = 0; i < imageData.length; i++) {
+				// Applica l'effetto solo alle immagini visibili nell'intervallo
+				const visibleData = imageData.filter(d => d.isVisible);
+				for (let i = 0; i < visibleData.length; i++) {
 					const distance = Math.abs(i - hoveredIndex);
 
 					if (distance <= waveRange) {
 						const influence = 1 - distance / waveRange;
 						const lift = maxLift * Math.pow(influence, 2);
 
-						imageData[i].targetY = imageData[i].originalY + lift;
+						visibleData[i].targetY = visibleData[i].originalY + lift;
 					}
 				}
 			}
@@ -329,7 +443,9 @@ const processedData = galleryData.map((item, index) => {
 		mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
 		raycaster.setFromCamera(mouse, camera);
-		const intersects = raycaster.intersectObjects(images);
+		// Filtra solo le immagini visibili
+		const visibleImages = images.filter(img => img.visible);
+		const intersects = raycaster.intersectObjects(visibleImages);
 
 		if (intersects.length > 0) {
 			isAnimating = true;
