@@ -69,25 +69,14 @@
 	padding: 0;
 	box-sizing: border-box;
 	cursor: url('/src/assets/Background/maria_grazia_mattei2 copy.png'), auto;
-	mix-blend-mode: difference;
 }
 
 body {
 	width: 100vw;
 	height: 100vh;
-	background: #000000;
-	font-family: var(--font-family);
-}
-
-body::before {
-	content: '';
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
 	background: #ffffff;
-	z-index: -1;
+	font-family: var(--font-family);
+	
 }
 
 /* Custom cursor */
@@ -100,13 +89,13 @@ body::before {
 	pointer-events: none;
 	z-index: 9999;
 	transform: translate(-50%, -50%);
-	transition: width 0.3s ease, height 0.3s ease;
 	mix-blend-mode: difference;
 }
 
 #custom-cursor.hover {
 	width: 20px;
 	height: 20px;
+	transition: width 0.3s ease, height 0.3s ease;
 }
 
 #canvas-container {
@@ -123,9 +112,10 @@ body::before {
 	display: block;
 	width: 100vw;
 	height: 100vh;
-	/* Background immagine dalla cartella assets */
-  /* background-image: url('/src/assets/Background/Background.jpg');
+	
+  background-image: url('/src/assets/Background/Background.jpg');
 	background-size: cover;
 	background-position: center;
-	background-repeat: no-repeat; */
+	background-repeat: no-repeat;
+  mix-blend-mode: normal !important;
 }

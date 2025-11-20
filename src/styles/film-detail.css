@@ -15,12 +15,11 @@
 .section-personaggio h1 {
 	font-size: var(--font-size-large);
 	margin: 0;
-	color: #ffffff;
+	color: #000000;
 	font-weight: 600;
 	line-height: 1.2;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
-	mix-blend-mode: difference;
 }
 
 /* Sezione 2: Film info e trama */
@@ -68,27 +67,24 @@
 .year,
 .director {
 	font-size: var(--font-size);
-	color: #ffffff;
+	color: #000000;
 	margin: 0;
 	font-weight: 600;
-	mix-blend-mode: difference;
 }
 
 .plot h2 {
 	font-size: var(--font-size-medium);
 	margin: 0 0 1rem 0;
-	color: #ffffff;
+	color: #000000;
 	font-weight: 600;
 	text-align: left;
-	mix-blend-mode: difference;
 }
 
 .plot p {
 	font-size: var(--font-size);
 	line-height: 1.6;
-	color: #ffffff;
+	color: #333;
 	margin: 0;
-	mix-blend-mode: difference;
 }
 
 /* Sezione 3: Innovazione */
@@ -117,19 +113,17 @@
 
 .innovazione-label {
 	font-size: var(--font-size);
-	color: #ffffff;
+	color: #666;
 	font-weight: 400;
-	mix-blend-mode: difference;
 }
 
 .innovazione-title {
 	font-size: var(--font-size-large);
 	margin: 0 0 1rem 0;
-	color: #ffffff;
+	color: #000000;
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
-	mix-blend-mode: difference;
 }
 
 .innovazione-description {
@@ -139,9 +133,8 @@
 .innovazione-description p {
 	font-size: var(--font-size);
 	line-height: 1.6;
-	color: #ffffff;
+	color: #333;
 	margin: 0;
-	mix-blend-mode: difference;
 }
 
 .innovazione-gallery {
