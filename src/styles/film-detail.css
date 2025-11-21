@@ -36,7 +36,6 @@
 .section-personaggio {
 	grid-column: 1 / -1;
 	padding: 3rem 0rem;
-	margin-bottom: 3rem;
 	border-bottom: 1px solid #000000;
 }
 
@@ -57,7 +56,6 @@
 	grid-template-columns: repeat(24, 1fr);
 	gap: 1rem;
 	padding: 2rem 0rem;
-	margin-bottom: 3rem;
 	border-bottom: 1px solid #000000;
 }
 
@@ -112,7 +110,7 @@
 	width: 100%;
 	aspect-ratio: 3 / 4;
 	overflow: hidden;
-	border-radius: 8px;
+	
 }
 
 .film-image img {
@@ -155,7 +153,6 @@
 	display: grid;
 	grid-template-columns: repeat(24, 1fr);
 	gap: 1rem;
-	border-bottom: 1px solid #000000;
 }
 
 .innovazione-left {
@@ -176,13 +173,12 @@
 }
 
 .innovazione-description {
-	margin-bottom: 0;
+	margin-bottom: 2rem;
 }
 
 .innovazione-description p {
 	font-size: var(--font-size);
 	line-height: 1.6;
-	color: #333;
 	margin: 0;
 }
 
@@ -225,21 +221,15 @@
 	object-fit: cover;
 }
 
-/* .gallery-img2 {
-	height: 50%;
-} */
-
 .gallery-placeholder {
 	width: 100%;
 	aspect-ratio: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-radius: 8px;
 	color: white;
 	font-weight: 600;
 	font-size: 1.2rem;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 @media (max-width: 768px) {
