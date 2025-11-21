@@ -519,13 +519,16 @@ const musicFiles = [
 	// Play/Pause
 	playPauseBtn?.addEventListener("click", () => {
 		if (audio.paused) {
-			audio.play().then(() => {
-				playPauseBtn.textContent = "■";
-				playPauseBtn.setAttribute("aria-label", "Pause");
-				musicIndicator?.classList.add("playing");
-			}).catch(err => {
-				console.log("Playback error:", err);
-			});
+			audio
+				.play()
+				.then(() => {
+					playPauseBtn.textContent = "■";
+					playPauseBtn.setAttribute("aria-label", "Pause");
+					musicIndicator?.classList.add("playing");
+				})
+				.catch(err => {
+					console.log("Playback error:", err);
+				});
 		} else {
 			audio.pause();
 			playPauseBtn.textContent = "▶";
