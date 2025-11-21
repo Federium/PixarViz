@@ -4,6 +4,7 @@ import rawData from "../../data/pixar_archivio.json";
 interface Film {
 	ID: number;
 	TITLE: string;
+	FILM_NAME: string | null;
 	YEAR: number | null;
 	SRC: string;
 	optimizedSrc: string;
@@ -62,6 +63,7 @@ export async function getStaticPaths() {
 		return {
 			ID: raw.ID ?? index + 1,
 			TITLE: name,
+			FILM_NAME: raw["Film/corto"] || null,
 			YEAR: raw.Anno || null,
 			SRC: src,
 			optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
@@ -109,6 +111,21 @@ import Footer from "../../components/Footer.astro";
 	<body>
 		<div id="custom-cursor"></div>
 		<FilmHeader />
+
+		<!-- Cover Image -->
+		<div class="cover-image">
+			{
+				film.optimizedSrc ? (
+					<img src={film.optimizedSrc} alt={film.TITLE} loading="eager" />
+				) : film.placeholderColor ? (
+					<div
+						class="placeholder-cover"
+						style={`background-color: ${film.placeholderColor};`}
+					/>
+				) : null
+			}
+		</div>
+
 		<div class="film-detail">
 			<!-- DIV 1: Personaggio -->
 			<div class="section-personaggio">
@@ -118,48 +135,64 @@ import Footer from "../../components/Footer.astro";
 			<!-- DIV 2: Film info e trama -->
 			<div class="section-film-info">
 				<div class="film-left">
-					{film.YEAR && <p class="year">Anno: {film.YEAR}</p>}
-					{film.DIRECTOR && <p class="director">Regia: {film.DIRECTOR}</p>}
-				</div>
-				<div class="film-right">
-					<div class="film-image">
-						{
-							film.optimizedSrc ? (
-								<img
-									src={film.optimizedSrc}
-									alt={film.TITLE}
-									loading="eager"
-									width="400"
-									height="300"
-								/>
-							) : film.placeholderColor ? (
-								<div
-									class="placeholder-image"
-									style={`background-color: ${film.placeholderColor};`}
-								/>
-							) : null
-						}
-					</div>
 					{
-						film.PLOT && (
-							<div class="plot">
-								<h2>Trama</h2>
-								<p>{film.PLOT}</p>
-							</div>
+						film.FILM_NAME && (
+							<>
+								<span class="info-label">Film:</span>
+								<span class="info-value">{film.FILM_NAME}</span>
+							</>
+						)
+					}
+					{
+						film.DIRECTOR && (
+							<>
+								<span class="info-label">Regia:</span>
+								<span class="info-value">{film.DIRECTOR}</span>
+							</>
+						)
+					}
+					{
+						film.YEAR && (
+							<>
+								<span class="info-label">Anno:</span>
+								<span class="info-value">{film.YEAR}</span>
+							</>
 						)
 					}
 				</div>
+				<div class="film-image">
+					{
+						film.optimizedSrc ? (
+							<img
+								src={film.optimizedSrc}
+								alt={film.TITLE}
+								loading="eager"
+								width="400"
+								height="300"
+							/>
+						) : film.placeholderColor ? (
+							<div
+								class="placeholder-image"
+								style={`background-color: ${film.placeholderColor};`}
+							/>
+						) : null
+					}
+				</div>
+				{
+					film.PLOT && (
+						<div class="plot">
+							<h2>Trama</h2>
+							<p>{film.PLOT}</p>
+						</div>
+					)
+				}
 			</div>
 
 			<!-- DIV 3: Innovazione -->
 			<div class="section-innovazione">
 				<div class="innovazione-left">
-					<span class="innovazione-label">Innovazione:</span>
-					{
-						film.TECHNIQUE && (
-							<h2 class="innovazione-title">{film.TECHNIQUE}</h2>
-						)
-					}
+					<span class="info-label">Innovation:</span>
+					{film.TECHNIQUE && <span class="info-value">{film.TECHNIQUE}</span>}
 				</div>
 				<div class="innovazione-right">
 					{
@@ -171,20 +204,23 @@ import Footer from "../../components/Footer.astro";
 					}
 				</div>
 				<div class="innovazione-gallery">
-					<div class="gallery-placeholder" style="background-color: #FF6B6B;">
+					<div
+						class="gallery-img2 gallery-placeholder"
+						style="background-color: #FF6B6B;"
+					>
 						Img2
 					</div>
-					<div class="gallery-placeholder" style="background-color: #4ECDC4;">
-						Img3
-					</div>
-					<div class="gallery-placeholder" style="background-color: #45B7D1;">
+					<div
+						class="gallery-img4 gallery-placeholder"
+						style="background-color: #45B7D1;"
+					>
 						Img4
 					</div>
-					<div class="gallery-placeholder" style="background-color: #FFA07A;">
-						Img5
-					</div>
-					<div class="gallery-placeholder" style="background-color: #98D8C8;">
-						Img6
+					<div
+						class="gallery-img3 gallery-placeholder"
+						style="background-color: #4ECDC4;"
+					>
+						Img3
 					</div>
 				</div>
 			</div>
