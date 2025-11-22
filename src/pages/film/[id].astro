@@ -4,6 +4,7 @@ import rawData from "../../data/pixar_archivio.json";
 interface Film {
 	ID: number;
 	TITLE: string;
+	CHARACTER: string | null;
 	FILM_NAME: string | null;
 	YEAR: number | null;
 	SRC: string;
@@ -63,6 +64,7 @@ export async function getStaticPaths() {
 		return {
 			ID: raw.ID ?? index + 1,
 			TITLE: name,
+			CHARACTER: raw["Personaggio/soggetto"] || null,
 			FILM_NAME: raw["Film/corto"] || null,
 			YEAR: raw.Anno || null,
 			SRC: src,
@@ -129,7 +131,7 @@ import Footer from "../../components/Footer.astro";
 		<div class="film-detail">
 			<!-- DIV 1: Personaggio -->
 			<div class="section-personaggio">
-				<h1>{film.TITLE}</h1>
+				<h1>{film.CHARACTER || film.TITLE}</h1>
 			</div>
 
 			<!-- DIV 2: Film info e trama -->
