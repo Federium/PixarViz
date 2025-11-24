@@ -32,8 +32,8 @@ const processedData = galleryData.map((item, index) => {
 	const personaggio = raw["Personaggio/soggetto"] || "";
 	const film = raw["Film/corto"] || "";
 	const anno = raw.Anno || "";
-	const innovazione = raw["Nome Innovazione"] || "";
-	const category = raw["Categoria Innovazione (tag)"] || "";
+	const innovazione = raw["Nome Innovazione 1"] || "";
+	const category = raw["Categoria Innovazione (tag) 1"] || "";
 
 	// Prefer `Copertina` if present, otherwise fall back to first ImgXX
 	let src = raw.Copertina || "";
@@ -102,13 +102,17 @@ const processedData = galleryData.map((item, index) => {
 	<div id="filter-options-container" class="filter-options-container hidden">
 		<button class="filter-button active" data-category="all">Tutte</button>
 		<button class="filter-button" data-category="Movimento">Movimento</button>
+		<button class="filter-button" data-category="Motion">Motion</button>
 		<button class="filter-button" data-category="Luci">Luci</button>
+		<button class="filter-button" data-category="Lights">Lights</button>
 		<button class="filter-button" data-category="Modellazione"
 			>Modellazione</button
 		>
+		<button class="filter-button" data-category="Modeling">Modeling</button>
 		<button class="filter-button" data-category="Texture">Texture</button>
 		<button class="filter-button" data-category="Sfondo">Sfondo</button>
-		<button class="filter-button" data-category="Materiale">Materiale</button>
+		<button class="filter-button" data-category="Background">Background</button>
+		<button class="filter-button" data-category="Materials">Materials</button>
 	</div>
 </div>
 
@@ -183,7 +187,7 @@ const processedData = galleryData.map((item, index) => {
 
 			const data = JSON.parse(galleryDataStr);
 			const numImages = data.length;
-			const spacing = 0.4;
+			const spacing = 0.2;
 
 			console.log(
 				`Caricamento di ${numImages} immagini da dati pre-caricati...`
@@ -230,14 +234,14 @@ const processedData = galleryData.map((item, index) => {
 				const mesh = new THREE.Mesh(geometry, material);
 
 				// Posizionamento finale con variazioni casuali
-				const finalX = (Math.random() - 0.02) * 0.02;
-				const finalY = -0.2 + (Math.random() - 0.02) * 0.01;
+				const finalX = (Math.random() - 0.01) * 0.01;
+				const finalY = -0.1 + (Math.random() - 0.01) * 0.01;
 				const finalZ =
 					(i - (numImages - 1) / 2) * spacing + (Math.random() - 0.2) * 0.08;
 
 				// Posizione iniziale (leggero spostamento in alto a destra)
 				const startX = finalX + 0.1;
-				const startY = finalY + 0.2;
+				const startY = finalY + 0.1;
 				const startZ = finalZ + 0.1;
 
 				mesh.position.set(startX, startY, startZ);

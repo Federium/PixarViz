@@ -47,6 +47,32 @@ async function optimizeImage(inputPath, outputPath) {
 }
 
 /**
+ * Processa ricorsivamente tutte le immagini nelle sottocartelle
+ */
+async function processDirectory(dir) {
+	const entries = await fs.readdir(dir, { withFileTypes: true });
+	const imageFiles = [];
+
+	for (const entry of entries) {
+		const fullPath = path.join(dir, entry.name);
+
+		if (entry.isDirectory()) {
+			// Ricorsione nelle sottocartelle
+			const subImages = await processDirectory(fullPath);
+			imageFiles.push(...subImages);
+		} else if (entry.isFile()) {
+			// Controlla se è un'immagine
+			const ext = path.extname(entry.name).toLowerCase();
+			if (['.jpg', '.jpeg', '.png', '.webp', '.avif'].includes(ext)) {
+				imageFiles.push(fullPath);
+			}
+		}
+	}
+
+	return imageFiles;
+}
+
+/**
  * Processa tutte le immagini nella cartella di input
  */
 async function processAllImages() {
@@ -54,22 +80,14 @@ async function processAllImages() {
 		// Assicurati che la cartella di output esista
 		await fs.mkdir(outputDir, { recursive: true });
 
-		// Leggi tutti i file dalla cartella di input
-		const files = await fs.readdir(inputDir);
-
-		// Filtra solo le immagini
-		const imageFiles = files.filter(file => {
-			const ext = path.extname(file).toLowerCase();
-			return ['.jpg', '.jpeg', '.png', '.webp', '.avif'].includes(ext);
-		});
+		// Trova tutte le immagini ricorsivamente
+		const imageFiles = await processDirectory(inputDir);
 
 		console.log(`Trovate ${imageFiles.length} immagini da ottimizzare\n`);
 
 		// Ottimizza tutte le immagini
-		for (const file of imageFiles) {
-			const inputPath = path.join(inputDir, file);
-			const outputPath = path.join(outputDir, file);
-			await optimizeImage(inputPath, outputPath);
+		for (const inputPath of imageFiles) {
+			await optimizeImage(inputPath, outputDir);
 		}
 
 		console.log(`\n✅ Tutte le immagini sono state ottimizzate!`);

@@ -9,12 +9,17 @@ interface Film {
 	YEAR: number | null;
 	SRC: string;
 	optimizedSrc: string;
+	posterSrc: string;
+	optimizedPosterSrc: string;
 	placeholderColor: string | null;
 	TECHNIQUE: string | null;
 	DESCRIPTION: string | null;
 	CATEGORY: string;
 	DIRECTOR: string | null;
 	PLOT: string | null;
+	img01Src: string;
+	img02Src: string;
+	img03Src: string;
 }
 
 export async function getStaticPaths() {
@@ -45,21 +50,42 @@ export async function getStaticPaths() {
 		const name =
 			raw["Film/corto"] || raw["Personaggio/soggetto"] || `Film ${index + 1}`;
 
-		// Prefer Copertina, otherwise look for first ImgXX
-		let src = raw.Copertina || "";
-		if (!src) {
+		// Prefer Copertina for cover, otherwise look for first ImgXX
+		let coverSrc = raw.Copertina || "";
+		if (!coverSrc) {
 			for (let i = 1; i <= 10; i++) {
 				const key = `Img${String(i).padStart(2, "0")}`;
 				if (raw[key]) {
-					src = raw[key];
+					coverSrc = raw[key];
 					break;
 				}
 			}
 		}
 
+		// Get Poster for film info section
+		let posterSrc = raw.Poster || "";
+
 		const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
-		const filename = src ? src.split("/").pop() || "" : "";
-		const nameWithoutExt = filename.replace(extPattern, "");
+
+		const coverFilename = coverSrc ? coverSrc.split("/").pop() || "" : "";
+		const coverNameWithoutExt = coverFilename.replace(extPattern, "");
+
+		const posterFilename = posterSrc ? posterSrc.split("/").pop() || "" : "";
+		const posterNameWithoutExt = posterFilename.replace(extPattern, "");
+
+		// Get innovation images (Img01, Img02, Img03)
+		const img01 = raw.Img01 || "";
+		const img02 = raw.Img02 || "";
+		const img03 = raw.Img03 || "";
+
+		const img01Filename = img01 ? img01.split("/").pop() || "" : "";
+		const img01NameWithoutExt = img01Filename.replace(extPattern, "");
+
+		const img02Filename = img02 ? img02.split("/").pop() || "" : "";
+		const img02NameWithoutExt = img02Filename.replace(extPattern, "");
+
+		const img03Filename = img03 ? img03.split("/").pop() || "" : "";
+		const img03NameWithoutExt = img03Filename.replace(extPattern, "");
 
 		return {
 			ID: raw.ID ?? index + 1,
@@ -67,14 +93,29 @@ export async function getStaticPaths() {
 			CHARACTER: raw["Personaggio/soggetto"] || null,
 			FILM_NAME: raw["Film/corto"] || null,
 			YEAR: raw.Anno || null,
-			SRC: src,
-			optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
-			placeholderColor: !src ? getRandomColor(index) : null,
-			TECHNIQUE: raw["Nome Innovazione"] || null,
-			DESCRIPTION: raw["Paragrafo descrizione innovazione"] || null,
-			CATEGORY: raw["Categoria Innovazione (tag)"] || "",
+			SRC: coverSrc,
+			optimizedSrc: coverNameWithoutExt
+				? `/images/${coverNameWithoutExt}.webp`
+				: "",
+			posterSrc: posterSrc,
+			optimizedPosterSrc: posterNameWithoutExt
+				? `/images/${posterNameWithoutExt}.webp`
+				: "",
+			placeholderColor: !coverSrc ? getRandomColor(index) : null,
+			TECHNIQUE: raw["Nome Innovazione 1"] || null,
+			DESCRIPTION: raw["Paragrafo motivazione innovazione 1"] || null,
+			CATEGORY: raw["Categoria Innovazione (tag) 1"] || "",
 			DIRECTOR: raw["Regista/autore"] || null,
 			PLOT: raw.Trama || null,
+			img01Src: img01NameWithoutExt
+				? `/images/${img01NameWithoutExt}.webp`
+				: "",
+			img02Src: img02NameWithoutExt
+				? `/images/${img02NameWithoutExt}.webp`
+				: "",
+			img03Src: img03NameWithoutExt
+				? `/images/${img03NameWithoutExt}.webp`
+				: "",
 		};
 	});
 
@@ -164,9 +205,9 @@ import Footer from "../../components/Footer.astro";
 				</div>
 				<div class="film-image">
 					{
-						film.optimizedSrc ? (
+						film.optimizedPosterSrc ? (
 							<img
-								src={film.optimizedSrc}
+								src={film.optimizedPosterSrc}
 								alt={film.TITLE}
 								loading="eager"
 								width="400"
@@ -206,24 +247,39 @@ import Footer from "../../components/Footer.astro";
 					}
 				</div>
 				<div class="innovazione-gallery">
-					<div
-						class="gallery-img2 gallery-placeholder"
-						style="background-color: #FF6B6B;"
-					>
-						Img2
-					</div>
-					<div
-						class="gallery-img4 gallery-placeholder"
-						style="background-color: #45B7D1;"
-					>
-						Img4
-					</div>
-					<div
-						class="gallery-img3 gallery-placeholder"
-						style="background-color: #4ECDC4;"
-					>
-						Img3
-					</div>
+					{
+						film.img01Src && (
+							<div class="gallery-img1">
+								<img
+									src={film.img01Src}
+									alt="Innovation image 1"
+									loading="lazy"
+								/>
+							</div>
+						)
+					}
+					{
+						film.img02Src && (
+							<div class="gallery-img2">
+								<img
+									src={film.img02Src}
+									alt="Innovation image 2"
+									loading="lazy"
+								/>
+							</div>
+						)
+					}
+					{
+						film.img03Src && (
+							<div class="gallery-img3">
+								<img
+									src={film.img03Src}
+									alt="Innovation image 3"
+									loading="lazy"
+								/>
+							</div>
+						)
+					}
 				</div>
 			</div>
 		</div>

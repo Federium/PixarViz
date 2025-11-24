@@ -32,8 +32,8 @@ const processedData = galleryData.map((item, index) => {
 	const personaggio = raw["Personaggio/soggetto"] || "";
 	const film = raw["Film/corto"] || "";
 	const anno = raw.Anno || "";
-	const category = raw["Categoria Innovazione (tag)"] || "";
-	const nomeInnovazione = raw["Nome Innovazione"] || "";
+	const category = raw["Categoria Innovazione (tag) 1"] || "";
+	const nomeInnovazione = raw["Nome Innovazione 1"] || "";
 
 	// Prefer `Copertina` if present, otherwise look for the first ImgXX field
 	let src = raw.Copertina || "";
