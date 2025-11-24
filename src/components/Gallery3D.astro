@@ -72,9 +72,9 @@ const processedData = galleryData.map((item, index) => {
 <div id="canvas-container" data-gallery={JSON.stringify(processedData)}></div>
 <div id="image-info">
 	<div id="image-personaggio"></div>
+	<div id="image-innovazione-box" class="innovation-tag"></div>
 	<div class="image-details">
 		<div id="image-film"></div>
-		<div id="image-innovazione"></div>
 		<div id="image-anno"></div>
 	</div>
 </div>
@@ -365,7 +365,7 @@ const processedData = galleryData.map((item, index) => {
 	const titleElement = document.getElementById("image-info");
 	const personaggioElement = document.getElementById("image-personaggio");
 	const filmElement = document.getElementById("image-film");
-	const innovazioneElement = document.getElementById("image-innovazione");
+	const innovazioneElement = document.getElementById("image-innovazione-box");
 	const annoElement = document.getElementById("image-anno");
 
 	// Event listener per il mouse
@@ -392,7 +392,7 @@ const processedData = galleryData.map((item, index) => {
 			if (filmElement)
 				filmElement.textContent = `Film: ${hoveredMesh.userData.film}`;
 			if (innovazioneElement)
-				innovazioneElement.textContent = `Innovazione: ${hoveredMesh.userData.innovazione}`;
+				innovazioneElement.textContent = hoveredMesh.userData.innovazione || "";
 			if (annoElement)
 				annoElement.textContent = `Anno: ${hoveredMesh.userData.anno}`;
 			titleElement.classList.add("visible");
