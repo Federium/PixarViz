@@ -16,7 +16,7 @@
 	color: #000000;
 	border: 2px solid #000000;
 	border-radius: 0;
-	padding: 0.75rem 1.5rem;
+	padding: 0.4rem 0.6rem;
 	font-size: var(--font-size);
 	font-weight: 600;
 	font-family: var(--font-family);
@@ -65,7 +65,7 @@
 	color: #000000;
 	border: 2px solid #000000;
 	border-radius: 0;
-	padding: 0.65rem 1.25rem;
+	padding: 0.4rem 0.6rem;
 	font-size: var(--font-size);
 	font-weight: 600;
 	font-family: var(--font-family);

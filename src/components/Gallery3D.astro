@@ -166,8 +166,54 @@ const processedData = galleryData.map((item, index) => {
 		isVisible: boolean;
 	}[] = [];
 
+	// Array per le etichette della timeline
+	const timelineLabels: THREE.Mesh[] = [];
+
 	// TextureLoader
 	const textureLoader = new THREE.TextureLoader();
+
+	// Funzione per creare un'etichetta di testo 3D per la timeline
+	function createTimelineLabel(
+		text: string,
+		position: THREE.Vector3
+	): THREE.Mesh {
+		const canvas = document.createElement("canvas");
+		const context = canvas.getContext("2d");
+		if (!context) return new THREE.Mesh();
+
+		// Aumenta la risoluzione del canvas per testo più nitido
+		canvas.width = 512;
+		canvas.height = 128;
+
+		// Sfondo trasparente
+		context.clearRect(0, 0, canvas.width, canvas.height);
+
+		// Testo con dimensione proporzionata alla risoluzione più alta
+		context.font = 'bold 72px "Helvetica Neue", Arial, sans-serif';
+		context.fillStyle = "#000000";
+		context.textAlign = "center";
+		context.textBaseline = "middle";
+		context.fillText(text, canvas.width / 2, canvas.height / 2);
+
+		// Crea texture e mesh con PlaneGeometry per poterla ruotare
+		const texture = new THREE.CanvasTexture(canvas);
+		texture.minFilter = THREE.LinearFilter;
+		texture.magFilter = THREE.LinearFilter;
+		const material = new THREE.MeshBasicMaterial({
+			map: texture,
+			transparent: true,
+			opacity: 0.9,
+			side: THREE.DoubleSide,
+		});
+		const geometry = new THREE.PlaneGeometry(1.2, 0.3);
+		const mesh = new THREE.Mesh(geometry, material);
+
+		mesh.position.copy(position);
+		// Rotazione di 90° sull'asse X per renderla orizzontale (parallela al piano XZ)
+		mesh.rotation.x = -Math.PI / 2;
+
+		return mesh;
+	}
 
 	// Variabili per animazione iniziale
 	let isInitialAnimationComplete = false;
@@ -280,12 +326,54 @@ const processedData = galleryData.map((item, index) => {
 					isVisible: true,
 				});
 			});
+
+			// Crea le etichette della timeline
+			// Estrai anni unici e ordinali
+			const uniqueYears = [...new Set(data.map((item: any) => item.ANNO))]
+				.filter((year): year is number => typeof year === "number" && year > 0)
+				.sort((a, b) => a - b);
+
+			// Seleziona circa 10 date distribuite uniformemente
+			const step = Math.max(1, Math.floor(uniqueYears.length / 10));
+			const selectedYears = uniqueYears
+				.filter((_, index) => index % step === 0)
+				.slice(0, 12);
+
+			// Posiziona le etichette lungo l'asse Z
+			selectedYears.forEach((year: number, index) => {
+				// Trova la posizione Z media delle immagini di quell'anno
+				const yearImages = imageData.filter(img => {
+					const imgYear = data.find(
+						(d: any) => d.ID === img.mesh.userData.id
+					)?.ANNO;
+					return imgYear === year;
+				});
+
+				if (yearImages.length > 0) {
+					const avgZ =
+						yearImages.reduce((sum, img) => sum + img.originalZ, 0) /
+						yearImages.length;
+
+					// ////////// POSIZIONE L'ETICHETTA //////////
+					// ////////// POSIZIONE L'ETICHETTA //////////
+					// ////////// POSIZIONE L'ETICHETTA //////////
+					// ////////// POSIZIONE L'ETICHETTA //////////
+					// ////////// POSIZIONE L'ETICHETTA //////////
+					const position = new THREE.Vector3(2.4, -0.6, avgZ);
+					const label = createTimelineLabel(year.toString(), position);
+					// Imposta opacity iniziale a 0 per animazione fade-in
+					if (label.material instanceof THREE.MeshBasicMaterial) {
+						label.material.opacity = 0;
+					}
+
+					scene.add(label);
+					timelineLabels.push(label);
+				}
+			});
 		} catch (error) {
 			console.error("Errore nel fetch dei dati:", error);
 		}
-	}
-
-	// Carica le immagini
+	} // Carica le immagini
 	loadImages();
 
 	// Gestione filtri per categoria
@@ -616,7 +704,17 @@ const processedData = galleryData.map((item, index) => {
 					const targetOpacity = 1;
 					material.opacity =
 						material.opacity + (targetOpacity - material.opacity) * 0.08;
-
+					// Fade-in delle etichette timeline
+					if (progress > 0.5) {
+						timelineLabels.forEach(label => {
+							if (label.material instanceof THREE.MeshBasicMaterial) {
+								const targetOpacity = 0.9;
+								label.material.opacity =
+									label.material.opacity +
+									(targetOpacity - label.material.opacity) * 0.05;
+							}
+						});
+					}
 					// Controlla se questa immagine ha completato l'animazione
 					const threshold = 0.01;
 					if (
@@ -646,6 +744,12 @@ const processedData = galleryData.map((item, index) => {
 					);
 					const material = data.mesh.material as THREE.MeshBasicMaterial;
 					material.opacity = 1;
+				});
+				// Fade-in delle etichette della timeline
+				timelineLabels.forEach(label => {
+					if (label.material instanceof THREE.MeshBasicMaterial) {
+						label.material.opacity = 0.9;
+					}
 				});
 			}
 		} else {
