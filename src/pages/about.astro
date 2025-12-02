@@ -1,0 +1,189 @@
+---
+import "../styles/style.css";
+import FilmHeader from "../components/FilmHeader.astro";
+import footerData from "../data/footer.json";
+---
+
+<html lang="it">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta
+			name="description"
+			content="Pixar Viz — Archivio 3D e collection dedicata ai film Pixar. Informazioni sul progetto e sul team."
+		/>
+		<title>About — Pixar Viz</title>
+	</head>
+
+	<body>
+		<div id="custom-cursor"></div>
+		<FilmHeader />
+
+		<main class="about-page">
+			<div class="about-left">
+				<div class="about-grid">
+					<span class="about-label">Projects:</span>
+					<span class="about-value"
+						>Politecnico di Milano <br /> Cultura dell'immagine digitale <br /> A.A.
+						2025/2026</span
+					>
+
+					<span class="about-label">Group:</span>
+					<div class="about-value">
+						{footerData.Nomi.map(nome => <div>{nome}</div>)}
+					</div>
+
+					<span class="about-label">Professors:</span>
+					<span class="about-value"
+						>Maria Grazia Mattei <br /> Alice Polerà</span
+					>
+				</div>
+
+				<div class="about-logo">
+					<img src="/title.svg" alt="Pixar 3D Archive" />
+				</div>
+			</div>
+
+			<div class="about-right">
+				<p class="about-text">
+					This project was born from a simple curiosity: what happens if we look
+					at Pixar not just as a studio that tells stories, but as a place where
+					technology quietly evolves film after film? Each movie carries its own
+					narrative world, yet behind the scenes it also contains a technical
+					challenge, an algorithm invented from scratch, a new way to simulate
+					light, water, hair or emotion. By mapping these innovations, the
+					website turns the Pixar filmography into a kind of technological
+					timeline where creativity and engineering constantly push each other
+					forward. Seeing the films arranged this way reveals something that
+					often stays invisible: Pixar’s identity is shaped as much by technical
+					breakthroughs as by storytelling. Innovation is not just a tool they
+					use; it is a force that opens new narrative possibilities and reshapes
+					what animation can become. The visualization is ultimately a reminder
+					that every leap in technology is also a leap in imagination, and that
+					the magic of these films lies in the space where the two meet.
+				</p>
+			</div>
+		</main>
+
+		<script>
+			// Custom cursor
+			const cursor = document.getElementById("custom-cursor");
+
+			document.addEventListener("mousemove", e => {
+				if (!cursor) return;
+
+				cursor.style.left = e.clientX + "px";
+				cursor.style.top = e.clientY + "px";
+
+				// Temporarily hide cursor to detect element underneath
+				cursor.style.pointerEvents = "none";
+				const elementUnderCursor = document.elementFromPoint(
+					e.clientX,
+					e.clientY
+				);
+				cursor.style.pointerEvents = "none"; // Keep it none
+
+				// Check if it's an interactive element
+				if (elementUnderCursor && elementUnderCursor !== cursor) {
+					const isInteractive =
+						elementUnderCursor.tagName === "BUTTON" ||
+						elementUnderCursor.tagName === "A" ||
+						elementUnderCursor.tagName === "INPUT" ||
+						elementUnderCursor.tagName === "SELECT" ||
+						elementUnderCursor.tagName === "TEXTAREA" ||
+						elementUnderCursor.closest("button, a, input, select, textarea");
+
+					if (isInteractive) {
+						cursor.classList.add("hover");
+					} else {
+						cursor.classList.remove("hover");
+					}
+				} else {
+					cursor.classList.remove("hover");
+				}
+			});
+		</script>
+
+		<style>
+			body {
+				min-height: 100vh;
+				margin: 0;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.about-page {
+				padding: 6.5rem 1.5rem 2rem;
+				margin: 0 auto;
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+				flex: 1;
+			}
+
+			.about-left {
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+			}
+
+			.about-grid {
+				display: grid;
+				grid-template-columns: repeat(12, 1fr);
+				gap: 1rem;
+				align-items: start;
+			}
+
+			.about-logo {
+				width: 100%;
+				margin-top: 2rem;
+			}
+
+			.about-logo img {
+				width: 100%;
+				height: auto;
+				display: block;
+			}
+
+			.about-label {
+				grid-column: 1 / 3;
+				font-family: var(--font-family);
+				font-size: var(--font-size);
+				font-weight: 600;
+				color: #000000;
+				line-height: 1.4;
+			}
+
+			.about-value {
+				grid-column: 3 / 13;
+				font-family: var(--font-family);
+				font-size: var(--font-size);
+				font-weight: 400;
+				color: #000000;
+				line-height: 1.4;
+			}
+
+			.about-right {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.about-text {
+				font-family: var(--font-family);
+				font-size: var(--font-size);
+				font-weight: 400;
+				color: #000000;
+				line-height: 1.6;
+				margin: 0;
+			}
+
+			@media (max-width: 768px) {
+				.about-page {
+					grid-template-columns: 1fr;
+					padding: 5rem 1rem 2rem;
+				}
+			}
+		</style>
+	</body>
+</html>
