@@ -218,25 +218,29 @@ const processedData = galleryData.map((item, index) => {
 				// Geometria rettangolare per l'immagine
 				const geometry = new THREE.PlaneGeometry(2, 1.5);
 
-			const texture = textureLoader.load(
-				item.optimizedSrc || item.SRC,
-				// onLoad callback
-				loadedTexture => {
-					console.log(`✅ Immagine caricata: ${item.PERSONAGGIO || item.FILM}`);
-					// Ottimizzazioni texture
-					loadedTexture.minFilter = THREE.LinearFilter;
-					loadedTexture.magFilter = THREE.LinearFilter;
-					loadedTexture.generateMipmaps = false;
-				},
-				// onProgress callback
-				undefined,
-				// onError callback
-				error => {
-					console.error(`❌ Errore caricamento ${item.PERSONAGGIO || item.FILM}: ${item.SRC}`);
-				}
-			);
-			const material = new THREE.MeshBasicMaterial({ map: texture });
-			const mesh = new THREE.Mesh(geometry, material);				// Posizionamento finale con variazioni casuali
+				const texture = textureLoader.load(
+					item.optimizedSrc || item.SRC,
+					// onLoad callback
+					loadedTexture => {
+						console.log(
+							`✅ Immagine caricata: ${item.PERSONAGGIO || item.FILM}`
+						);
+						// Ottimizzazioni texture
+						loadedTexture.minFilter = THREE.LinearFilter;
+						loadedTexture.magFilter = THREE.LinearFilter;
+						loadedTexture.generateMipmaps = false;
+					},
+					// onProgress callback
+					undefined,
+					// onError callback
+					error => {
+						console.error(
+							`❌ Errore caricamento ${item.PERSONAGGIO || item.FILM}: ${item.SRC}`
+						);
+					}
+				);
+				const material = new THREE.MeshBasicMaterial({ map: texture });
+				const mesh = new THREE.Mesh(geometry, material); // Posizionamento finale con variazioni casuali
 				const finalX = (Math.random() - 0.01) * 0.01;
 				const finalY = -0.1 + (Math.random() - 0.01) * 0.01;
 				const finalZ =
