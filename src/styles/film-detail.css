@@ -36,15 +36,15 @@
 .section-personaggio {
 	grid-column: 1 / -1;
 	padding: 3rem 0rem;
-	border-bottom: 1px solid #000000;
+	border-bottom: 1px solid var(--color-border);
 }
 
 .section-personaggio h1 {
 	font-size: var(--font-size-large);
 	margin: 0;
-	color: #000000;
-	font-weight: 600;
-	line-height: 1.2;
+	color: var(--color-text-primary);
+	font-weight: var(--font-weight-semibold);
+	line-height: var(--line-height-tight);
 	text-transform: uppercase;
 	letter-spacing: 0.02em;
 }
@@ -56,7 +56,7 @@
 	grid-template-columns: repeat(24, 1fr);
 	gap: 1rem;
 	padding: 2rem 0rem;
-	border-bottom: 1px solid #000000;
+	border-bottom: 1px solid var(--color-border);
 }
 
 .film-left {
@@ -72,9 +72,9 @@
 .info-label {
 	grid-column: 1 / 4;
 	font-size: var(--font-size);
-	color: #000000;
-	font-weight: 600;
-	line-height: 1.4;
+	color: var(--color-text-primary);
+	font-weight: var(--font-weight-semibold);
+	line-height: var(--line-height-normal);
 	margin: 0;
 	padding: 0;
 	display: block;
@@ -83,9 +83,9 @@
 .info-value {
 	grid-column: 4 / 9;
 	font-size: var(--font-size);
-	color: #000000;
-	font-weight: 400;
-	line-height: 1.4;
+	color: var(--color-text-primary);
+	font-weight: var(--font-weight-regular);
+	line-height: var(--line-height-normal);
 	margin: 0;
 	padding: 0;
 	display: block;
@@ -93,8 +93,8 @@
 
 .innovazione-left .info-value {
 	font-size: var(--font-size-medium);
-	font-weight: 600;
-	line-height: 1;
+	font-weight: var(--font-weight-semibold);
+	line-height: var(--line-height-compact);
 }
 
 .film-right {
@@ -133,15 +133,15 @@
 .plot h2 {
 	font-size: var(--font-size-medium);
 	margin: 0 0 1rem 0;
-	color: #000000;
-	font-weight: 600;
+	color: var(--color-text-primary);
+	font-weight: var(--font-weight-semibold);
 	text-align: left;
 }
 
 .plot p {
 	font-size: var(--font-size);
-	line-height: 1.6;
-	color: #333;
+	line-height: var(--line-height-relaxed);
+	color: var(--color-text-secondary);
 	margin: 0;
 }
 
@@ -178,7 +178,7 @@
 
 .innovazione-description p {
 	font-size: var(--font-size);
-	line-height: 1.6;
+	line-height: var(--line-height-relaxed);
 	margin: 0;
 }
 
@@ -240,9 +240,9 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: white;
-	font-weight: 600;
-	font-size: 1.2rem;
+	color: var(--color-background);
+	font-weight: var(--font-weight-semibold);
+	font-size: var(--font-size-small);
 }
 
 @media (max-width: 768px) {

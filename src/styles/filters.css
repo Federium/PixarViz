@@ -12,13 +12,13 @@
 }
 
 .filter-main-button {
-	background: #ffffff;
-	color: #000000;
-	border: 2px solid #000000;
+	background: var(--color-background);
+	color: var(--color-text-primary);
+	border: 2px solid var(--color-border);
 	border-radius: 0;
 	padding: 0.4rem 0.6rem;
 	font-size: var(--font-size);
-	font-weight: 600;
+	font-weight: var(--font-weight-semibold);
 	font-family: var(--font-family);
 	cursor: pointer;
 	display: flex;
@@ -28,12 +28,12 @@
 }
 
 .filter-main-button:hover {
-	background: #000000;
-	color: #ffffff;
+	background: var(--color-text-primary);
+	color: var(--color-background);
 }
 
 .filter-main-button:hover .arrow-icon {
-	color: #ffffff;
+	color: var(--color-background);
 }
 
 .filter-main-button .arrow-icon {
@@ -61,13 +61,13 @@
 }
 
 .filter-button {
-	background: #ffffff;
-	color: #000000;
-	border: 2px solid #000000;
+	background: var(--color-background);
+	color: var(--color-text-primary);
+	border: 2px solid var(--color-border);
 	border-radius: 0;
 	padding: 0.4rem 0.6rem;
 	font-size: var(--font-size);
-	font-weight: 600;
+	font-weight: var(--font-weight-semibold);
 	font-family: var(--font-family);
 	cursor: pointer;
 	transition: all 0.2s ease;
@@ -75,14 +75,14 @@
 }
 
 .filter-button:hover {
-	background: #000000;
-	color: #ffffff;
+	background: var(--color-text-primary);
+	color: var(--color-background);
 }
 
 .filter-button.active {
-	background: #000000;
-	color: #ffffff;
-	border-color: #000000;
+	background: var(--color-text-primary);
+	color: var(--color-background);
+	border-color: var(--color-border);
 }
 
 /* Responsive */
@@ -95,11 +95,11 @@
 	
 	.filter-main-button {
 		padding: 0.6rem 1.2rem;
-		font-size: 14pt;
+		font-size: var(--font-size-mobile-header);
 	}
 	
 	.filter-button {
 		padding: 0.55rem 1rem;
-		font-size: 14pt;
+		font-size: var(--font-size-mobile-header);
 	}
 }

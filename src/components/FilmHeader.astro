@@ -55,8 +55,8 @@
 	.header-link {
 		font-family: var(--font-family);
 		font-size: var(--font-size);
-		font-weight: 600;
-		color: #000000;
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
 		text-decoration: none;
 		background: none;
 		border: none;
@@ -71,9 +71,8 @@
 	.header-title {
 		font-family: var(--font-family);
 		font-size: var(--font-size);
-		color: #000000;
+		color: var(--color-text-primary);
 		user-select: none;
-		font-weight: 600;
 	}
 
 	@media (max-width: 768px) {
@@ -84,7 +83,7 @@
 
 		.header-link,
 		.header-title {
-			font-size: 0.7rem;
+			font-size: var(--font-size-mobile);
 		}
 	}
 </style>

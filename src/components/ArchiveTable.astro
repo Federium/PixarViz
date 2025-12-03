@@ -123,7 +123,7 @@ const processedData = galleryData.map((item, index) => {
 		gap: 1rem;
 		font-family: var(--font-family);
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: var(--font-weight-semibold);
 		margin-bottom: 1rem;
 		padding-bottom: 0.5rem;
 	}
@@ -133,7 +133,7 @@ const processedData = galleryData.map((item, index) => {
 		grid-template-columns: 60px 1fr 1fr 80px 200px 1fr;
 		gap: 1rem;
 		text-decoration: none;
-		color: #000000;
+		color: var(--color-text-primary);
 		font-family: var(--font-family);
 		transition: transform 0.1s ease;
 	}
@@ -144,7 +144,7 @@ const processedData = galleryData.map((item, index) => {
 
 	.item-id {
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: var(--font-weight-semibold);
 	}
 
 	.item-personaggio,
@@ -154,26 +154,26 @@ const processedData = galleryData.map((item, index) => {
 	.item-innovation,
 	.item-id {
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: var(--font-weight-semibold);
 		letter-spacing: -0.02em;
 	}
 
 	.item-anno {
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: var(--font-weight-semibold);
 		text-align: left;
 	}
 
 	.item-category {
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: var(--font-weight-semibold);
 		text-transform: capitalize;
 		text-align: left;
 	}
 
 	.item-innovation {
 		font-size: var(--font-size);
-		font-weight: 600;
+		font-weight: var(--font-weight-semibold);
 		text-align: left;
 	}
 
@@ -213,7 +213,7 @@ const processedData = galleryData.map((item, index) => {
 		.archive-header {
 			grid-template-columns: 40px 1fr 1fr 60px 120px 1fr;
 			gap: 0.5rem;
-			font-size: 0.65rem;
+			font-size: var(--font-size-mobile);
 			margin-bottom: 0.5rem;
 		}
 
@@ -229,7 +229,7 @@ const processedData = galleryData.map((item, index) => {
 		.item-anno,
 		.item-category,
 		.item-innovation {
-			font-size: 0.7rem;
+			font-size: var(--font-size-mobile);
 		}
 
 		.hover-image img {

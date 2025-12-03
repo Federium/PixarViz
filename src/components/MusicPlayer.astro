@@ -229,7 +229,7 @@ const musicFiles = [
 
 	.music-indicator .bar {
 		width: 2px;
-		background-color: #000000;
+		background-color: var(--color-text-primary);
 		animation: wave 0.8s ease-in-out infinite;
 	}
 
@@ -271,16 +271,16 @@ const musicFiles = [
 	#track-name {
 		font-family: var(--font-family);
 		font-size: var(--font-size);
-		font-weight: 600;
-		color: #000000;
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
 		user-select: none;
 	}
 
 	.control-btn {
 		font-family: var(--font-family);
 		font-size: var(--font-size);
-		font-weight: 600;
-		color: #000000;
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
 		background: none;
 		border: none;
 		padding: 0.25rem 0rem;
@@ -299,7 +299,7 @@ const musicFiles = [
 	#prev-btn,
 	#next-btn {
 		font-size: var(--font-size);
-		line-height: 1;
+		line-height: var(--line-height-compact);
 	}
 
 	#volume-btn {
