@@ -4,28 +4,6 @@ import galleryData from "../data/pixar_archivio.json";
 import "../styles/gallery3d.css";
 import "../styles/filters.css";
 
-// Generate random color for placeholder
-function getRandomColor(seed: number): string {
-	const colors = [
-		"#FF6B6B",
-		"#4ECDC4",
-		"#45B7D1",
-		"#FFA07A",
-		"#98D8C8",
-		"#F7DC6F",
-		"#BB8FCE",
-		"#85C1E2",
-		"#F8B195",
-		"#6C5CE7",
-		"#A8E6CF",
-		"#FFD3B6",
-		"#FFAAA5",
-		"#FF8B94",
-		"#C7CEEA",
-	];
-	return colors[seed % colors.length];
-}
-
 // Prepara i dati con percorsi ottimizzati per WebP
 const processedData = galleryData.map((item, index) => {
 	const raw: any = item;
@@ -51,9 +29,6 @@ const processedData = galleryData.map((item, index) => {
 	const filename = src ? src.split("/").pop() || "" : "";
 	const nameWithoutExt = filename.replace(extPattern, "");
 
-	// Generate placeholder color if no image
-	const placeholderColor = !src ? getRandomColor(index) : null;
-
 	return {
 		ID: raw.ID ?? index + 1,
 		PERSONAGGIO: personaggio,
@@ -63,7 +38,6 @@ const processedData = galleryData.map((item, index) => {
 		CATEGORY: category,
 		SRC: src,
 		optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
-		placeholderColor: placeholderColor,
 		raw: raw,
 	};
 });
@@ -244,42 +218,25 @@ const processedData = galleryData.map((item, index) => {
 				// Geometria rettangolare per l'immagine
 				const geometry = new THREE.PlaneGeometry(2, 1.5);
 
-				let material: THREE.MeshBasicMaterial;
-
-				if (item.optimizedSrc || item.SRC) {
-					// Carica direttamente la texture
-					const texture = textureLoader.load(
-						item.optimizedSrc || item.SRC,
-						// onLoad callback
-						loadedTexture => {
-							console.log(`✅ Immagine caricata: ${item.NAME}`);
-							// Ottimizzazioni texture
-							loadedTexture.minFilter = THREE.LinearFilter;
-							loadedTexture.magFilter = THREE.LinearFilter;
-							loadedTexture.generateMipmaps = false;
-						},
-						// onProgress callback
-						undefined,
-						// onError callback
-						error => {
-							console.error(`❌ Errore caricamento ${item.NAME}: ${item.SRC}`);
-						}
-					);
-					// Material con texture
-					material = new THREE.MeshBasicMaterial({ map: texture });
-				} else if (item.placeholderColor) {
-					// Material con colore piatto se nessuna immagine
-					console.log(`🎨 Placeholder colore per: ${item.NAME}`);
-					material = new THREE.MeshBasicMaterial({
-						color: item.placeholderColor,
-					});
-				} else {
-					// Fallback grigio
-					material = new THREE.MeshBasicMaterial({ color: "#CCCCCC" });
+			const texture = textureLoader.load(
+				item.optimizedSrc || item.SRC,
+				// onLoad callback
+				loadedTexture => {
+					console.log(`✅ Immagine caricata: ${item.PERSONAGGIO || item.FILM}`);
+					// Ottimizzazioni texture
+					loadedTexture.minFilter = THREE.LinearFilter;
+					loadedTexture.magFilter = THREE.LinearFilter;
+					loadedTexture.generateMipmaps = false;
+				},
+				// onProgress callback
+				undefined,
+				// onError callback
+				error => {
+					console.error(`❌ Errore caricamento ${item.PERSONAGGIO || item.FILM}: ${item.SRC}`);
 				}
-				const mesh = new THREE.Mesh(geometry, material);
-
-				// Posizionamento finale con variazioni casuali
+			);
+			const material = new THREE.MeshBasicMaterial({ map: texture });
+			const mesh = new THREE.Mesh(geometry, material);				// Posizionamento finale con variazioni casuali
 				const finalX = (Math.random() - 0.01) * 0.01;
 				const finalY = -0.1 + (Math.random() - 0.01) * 0.01;
 				const finalZ =

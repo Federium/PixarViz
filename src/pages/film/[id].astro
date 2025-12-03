@@ -11,7 +11,6 @@ interface Film {
 	optimizedSrc: string;
 	posterSrc: string;
 	optimizedPosterSrc: string;
-	placeholderColor: string | null;
 	TECHNIQUE: string | null;
 	DESCRIPTION: string | null;
 	CATEGORY: string;
@@ -23,28 +22,6 @@ interface Film {
 }
 
 export async function getStaticPaths() {
-	// Generate random color for placeholder
-	const getRandomColor = (seed: number): string => {
-		const colors = [
-			"#FF6B6B",
-			"#4ECDC4",
-			"#45B7D1",
-			"#FFA07A",
-			"#98D8C8",
-			"#F7DC6F",
-			"#BB8FCE",
-			"#85C1E2",
-			"#F8B195",
-			"#6C5CE7",
-			"#A8E6CF",
-			"#FFD3B6",
-			"#FFAAA5",
-			"#FF8B94",
-			"#C7CEEA",
-		];
-		return colors[seed % colors.length];
-	};
-
 	const filmData = rawData.map((item, index) => {
 		const raw: any = item;
 		const name =
@@ -101,7 +78,6 @@ export async function getStaticPaths() {
 			optimizedPosterSrc: posterNameWithoutExt
 				? `/images/${posterNameWithoutExt}.webp`
 				: "",
-			placeholderColor: !coverSrc ? getRandomColor(index) : null,
 			TECHNIQUE: raw["Nome Innovazione 1"] || null,
 			DESCRIPTION: raw["Paragrafo motivazione innovazione 1"] || null,
 			CATEGORY: raw["Categoria Innovazione (tag) 1"] || "",
@@ -158,14 +134,9 @@ import Footer from "../../components/Footer.astro";
 		<!-- Cover Image -->
 		<div class="cover-image">
 			{
-				film.optimizedSrc ? (
+				film.optimizedSrc && (
 					<img src={film.optimizedSrc} alt={film.TITLE} loading="eager" />
-				) : film.placeholderColor ? (
-					<div
-						class="placeholder-cover"
-						style={`background-color: ${film.placeholderColor};`}
-					/>
-				) : null
+				)
 			}
 		</div>
 
@@ -205,7 +176,7 @@ import Footer from "../../components/Footer.astro";
 				</div>
 				<div class="film-image">
 					{
-						film.optimizedPosterSrc ? (
+						film.optimizedPosterSrc && (
 							<img
 								src={film.optimizedPosterSrc}
 								alt={film.TITLE}
@@ -213,12 +184,7 @@ import Footer from "../../components/Footer.astro";
 								width="400"
 								height="300"
 							/>
-						) : film.placeholderColor ? (
-							<div
-								class="placeholder-image"
-								style={`background-color: ${film.placeholderColor};`}
-							/>
-						) : null
+						)
 					}
 				</div>
 				{

@@ -17,11 +17,6 @@
 	display: block;
 }
 
-.cover-image .placeholder-cover {
-	width: 100%;
-	height: 100%;
-}
-
 .film-detail {
 	padding: 4rem 1rem 0 1rem;
 	margin: 0;
@@ -117,12 +112,6 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	display: block;
-}
-
-.film-image .placeholder-image {
-	width: 100%;
-	height: 100%;
 	display: block;
 }
 

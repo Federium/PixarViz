@@ -3,28 +3,6 @@
 import galleryData from "../data/pixar_archivio.json";
 
 // Prepara i dati con percorsi ottimizzati per WebP
-// Generate random color for placeholder
-function getRandomColor(seed: number): string {
-	const colors = [
-		"#FF6B6B",
-		"#4ECDC4",
-		"#45B7D1",
-		"#FFA07A",
-		"#98D8C8",
-		"#F7DC6F",
-		"#BB8FCE",
-		"#85C1E2",
-		"#F8B195",
-		"#6C5CE7",
-		"#A8E6CF",
-		"#FFD3B6",
-		"#FFAAA5",
-		"#FF8B94",
-		"#C7CEEA",
-	];
-	return colors[seed % colors.length];
-}
-
 const processedData = galleryData.map((item, index) => {
 	const raw: any = item;
 	// New JSON uses Italian keys. Extract all needed columns.
@@ -51,9 +29,6 @@ const processedData = galleryData.map((item, index) => {
 	const filename = src ? src.split("/").pop() || "" : "";
 	const nameWithoutExt = filename.replace(extPattern, "");
 
-	// Generate placeholder color if no image
-	const placeholderColor = !src ? getRandomColor(index) : null;
-
 	return {
 		ID: id,
 		PERSONAGGIO: personaggio,
@@ -63,7 +38,6 @@ const processedData = galleryData.map((item, index) => {
 		NOME_INNOVAZIONE: nomeInnovazione,
 		SRC: src,
 		optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
-		placeholderColor: placeholderColor,
 		// keep the original raw item available if needed
 		raw: raw,
 	};
@@ -86,7 +60,6 @@ const processedData = galleryData.map((item, index) => {
 					href={`/film/${item.ID}`}
 					class="archive-item"
 					data-image={item.optimizedSrc}
-					data-placeholder={item.placeholderColor}
 					data-name={item.PERSONAGGIO || item.FILM}
 				>
 					<span class="item-id">[{String(item.ID).padStart(2, "0")}]</span>
@@ -100,7 +73,6 @@ const processedData = galleryData.map((item, index) => {
 		}
 	</div>
 	<div id="hover-image" class="hover-image">
-		<div class="placeholder-box"></div>
 		<img src="" alt="" />
 	</div>
 </div>
@@ -196,15 +168,6 @@ const processedData = galleryData.map((item, index) => {
 		object-fit: cover;
 	}
 
-	.hover-image .placeholder-box {
-		width: 150px;
-		height: 112px;
-		display: none;
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
-
 	@media (max-width: 768px) {
 		.archive-container {
 			padding: 3rem 1rem 2rem 1rem;
@@ -235,11 +198,6 @@ const processedData = galleryData.map((item, index) => {
 		.hover-image img {
 			width: 100px;
 		}
-
-		.hover-image .placeholder-box {
-			width: 100px;
-			height: 75px;
-		}
 	}
 </style>
 
@@ -247,9 +205,6 @@ const processedData = galleryData.map((item, index) => {
 	const archiveItems = document.querySelectorAll(".archive-item");
 	const hoverImage = document.getElementById("hover-image");
 	const hoverImg = hoverImage?.querySelector("img");
-	const placeholderBox = hoverImage?.querySelector(
-		".placeholder-box"
-	) as HTMLElement;
 
 	const totalItems = archiveItems.length;
 
@@ -301,27 +256,17 @@ const processedData = galleryData.map((item, index) => {
 		item.addEventListener("mouseenter", e => {
 			const target = e.currentTarget as HTMLElement;
 			const imageSrc = target.getAttribute("data-image");
-			const placeholderColor = target.getAttribute("data-placeholder");
 			const imageName = target.getAttribute("data-name");
 
-			if (hoverImage) {
+			if (hoverImage && imageSrc && hoverImg) {
 				// Get bouncing position based on index
 				const pos = getBouncingPosition(index);
 				hoverImage.style.left = pos.x + "px";
 				hoverImage.style.top = pos.y + "px";
 
-				if (imageSrc && hoverImg) {
-					// Show image
-					hoverImg.src = imageSrc;
-					hoverImg.alt = imageName || "";
-					hoverImg.style.display = "block";
-					if (placeholderBox) placeholderBox.style.display = "none";
-				} else if (placeholderColor && placeholderBox) {
-					// Show placeholder color
-					placeholderBox.style.backgroundColor = placeholderColor;
-					placeholderBox.style.display = "block";
-					if (hoverImg) hoverImg.style.display = "none";
-				}
+				// Show image
+				hoverImg.src = imageSrc;
+				hoverImg.alt = imageName || "";
 				hoverImage.classList.add("visible");
 			}
 		});
