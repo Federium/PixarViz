@@ -345,32 +345,49 @@ import Footer from "../../components/Footer.astro";
 			}
 
 			<!-- DIV 5: Links (se presenti) -->
-			{(film.LINK1 || film.LINK2 || film.LINK3) && (
-				<div class="section-links">
-					<div class="links-left">
-						<span class="info-label">Links:</span>
-					</div>
-					<div class="links-right">
-						<div class="links-list">
-							{film.LINK1 && (
-								<a href={film.LINK1} target="_blank" rel="noopener noreferrer" class="link-item">
-									{film.LINK1}
-								</a>
-							)}
-							{film.LINK2 && (
-								<a href={film.LINK2} target="_blank" rel="noopener noreferrer" class="link-item">
-									{film.LINK2}
-								</a>
-							)}
-							{film.LINK3 && (
-								<a href={film.LINK3} target="_blank" rel="noopener noreferrer" class="link-item">
-									{film.LINK3}
-								</a>
-							)}
+			{
+				(film.LINK1 || film.LINK2 || film.LINK3) && (
+					<div class="section-links">
+						<div class="links-left">
+							<span class="info-label">Links:</span>
+						</div>
+						<div class="links-right">
+							<div class="links-list">
+								{film.LINK1 && (
+									<a
+										href={film.LINK1}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="link-item"
+									>
+										{film.LINK1}
+									</a>
+								)}
+								{film.LINK2 && (
+									<a
+										href={film.LINK2}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="link-item"
+									>
+										{film.LINK2}
+									</a>
+								)}
+								{film.LINK3 && (
+									<a
+										href={film.LINK3}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="link-item"
+									>
+										{film.LINK3}
+									</a>
+								)}
+							</div>
 						</div>
 					</div>
-				</div>
-			)}
+				)
+			}
 		</div>
 		<Footer />
 
