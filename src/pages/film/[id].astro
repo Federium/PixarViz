@@ -14,11 +14,20 @@ interface Film {
 	TECHNIQUE: string | null;
 	DESCRIPTION: string | null;
 	CATEGORY: string;
+	TECHNIQUE2: string | null;
+	DESCRIPTION2: string | null;
+	CATEGORY2: string;
 	DIRECTOR: string | null;
 	PLOT: string | null;
+	LINK1: string | null;
+	LINK2: string | null;
+	LINK3: string | null;
 	img01Src: string;
 	img02Src: string;
 	img03Src: string;
+	img04Src: string;
+	img05Src: string;
+	img06Src: string;
 }
 
 export async function getStaticPaths() {
@@ -54,6 +63,9 @@ export async function getStaticPaths() {
 		const img01 = raw.Img01 || "";
 		const img02 = raw.Img02 || "";
 		const img03 = raw.Img03 || "";
+		const img04 = raw.Img04 || "";
+		const img05 = raw.Img05 || "";
+		const img06 = raw.Img06 || "";
 
 		const img01Filename = img01 ? img01.split("/").pop() || "" : "";
 		const img01NameWithoutExt = img01Filename.replace(extPattern, "");
@@ -63,6 +75,15 @@ export async function getStaticPaths() {
 
 		const img03Filename = img03 ? img03.split("/").pop() || "" : "";
 		const img03NameWithoutExt = img03Filename.replace(extPattern, "");
+
+		const img04Filename = img04 ? img04.split("/").pop() || "" : "";
+		const img04NameWithoutExt = img04Filename.replace(extPattern, "");
+
+		const img05Filename = img05 ? img05.split("/").pop() || "" : "";
+		const img05NameWithoutExt = img05Filename.replace(extPattern, "");
+
+		const img06Filename = img06 ? img06.split("/").pop() || "" : "";
+		const img06NameWithoutExt = img06Filename.replace(extPattern, "");
 
 		return {
 			ID: raw.ID ?? index + 1,
@@ -81,8 +102,14 @@ export async function getStaticPaths() {
 			TECHNIQUE: raw["Nome Innovazione 1"] || null,
 			DESCRIPTION: raw["Paragrafo motivazione innovazione 1"] || null,
 			CATEGORY: raw["Categoria Innovazione (tag) 1"] || "",
+			TECHNIQUE2: raw["Nome Innovazione 2"] || null,
+			DESCRIPTION2: raw["Paragrafo Funzionamento generale 2"] || null,
+			CATEGORY2: raw["Categoria Innovazione (tag) 2"] || "",
 			DIRECTOR: raw["Regista/autore"] || null,
 			PLOT: raw.Trama || null,
+			LINK1: raw["Link 1"] || null,
+			LINK2: raw["Link 2"] || null,
+			LINK3: raw["Link 3"] || null,
 			img01Src: img01NameWithoutExt
 				? `/images/${img01NameWithoutExt}.webp`
 				: "",
@@ -91,6 +118,15 @@ export async function getStaticPaths() {
 				: "",
 			img03Src: img03NameWithoutExt
 				? `/images/${img03NameWithoutExt}.webp`
+				: "",
+			img04Src: img04NameWithoutExt
+				? `/images/${img04NameWithoutExt}.webp`
+				: "",
+			img05Src: img05NameWithoutExt
+				? `/images/${img05NameWithoutExt}.webp`
+				: "",
+			img06Src: img06NameWithoutExt
+				? `/images/${img06NameWithoutExt}.webp`
 				: "",
 		};
 	});
@@ -116,7 +152,7 @@ import Footer from "../../components/Footer.astro";
 <html lang="it">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -125,7 +161,7 @@ import Footer from "../../components/Footer.astro";
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
 			rel="stylesheet"
 		/>
-		<title>{film.TITLE} - Pixar Viz</title>
+		<title>{film.TITLE} - © Pixar 3D ARCHIVE</title>
 	</head>
 	<body>
 		<div id="custom-cursor"></div>
@@ -143,6 +179,18 @@ import Footer from "../../components/Footer.astro";
 		<div class="film-detail">
 			<!-- DIV 1: Personaggio -->
 			<div class="section-personaggio">
+				<div class="innovation-tags">
+					{
+						film.TECHNIQUE && (
+							<span class="innovation-tag">{film.TECHNIQUE}</span>
+						)
+					}
+					{
+						film.TECHNIQUE2 && (
+							<span class="innovation-tag">{film.TECHNIQUE2}</span>
+						)
+					}
+				</div>
 				<h1>{film.CHARACTER || film.TITLE}</h1>
 			</div>
 
@@ -160,7 +208,7 @@ import Footer from "../../components/Footer.astro";
 					{
 						film.DIRECTOR && (
 							<>
-								<span class="info-label">Regia:</span>
+								<span class="info-label">Director:</span>
 								<span class="info-value">{film.DIRECTOR}</span>
 							</>
 						)
@@ -168,7 +216,7 @@ import Footer from "../../components/Footer.astro";
 					{
 						film.YEAR && (
 							<>
-								<span class="info-label">Anno:</span>
+								<span class="info-label">Year:</span>
 								<span class="info-value">{film.YEAR}</span>
 							</>
 						)
@@ -190,7 +238,6 @@ import Footer from "../../components/Footer.astro";
 				{
 					film.PLOT && (
 						<div class="plot">
-							<h2>Trama</h2>
 							<p>{film.PLOT}</p>
 						</div>
 					)
@@ -248,46 +295,89 @@ import Footer from "../../components/Footer.astro";
 					}
 				</div>
 			</div>
+
+			<!-- DIV 4: Innovazione 2 (se presente) -->
+			{
+				film.TECHNIQUE2 && (
+					<div class="section-innovazione">
+						<div class="innovazione-left">
+							<span class="info-label">Innovation 2:</span>
+							<span class="info-value">{film.TECHNIQUE2}</span>
+						</div>
+						<div class="innovazione-right">
+							{film.DESCRIPTION2 && (
+								<div class="innovazione-description">
+									<p>{film.DESCRIPTION2}</p>
+								</div>
+							)}
+						</div>
+						<div class="innovazione-gallery">
+							{film.img04Src && (
+								<div class="gallery-img1">
+									<img
+										src={film.img04Src}
+										alt="Innovation 2 image 1"
+										loading="lazy"
+									/>
+								</div>
+							)}
+							{film.img05Src && (
+								<div class="gallery-img2">
+									<img
+										src={film.img05Src}
+										alt="Innovation 2 image 2"
+										loading="lazy"
+									/>
+								</div>
+							)}
+							{film.img06Src && (
+								<div class="gallery-img3">
+									<img
+										src={film.img06Src}
+										alt="Innovation 2 image 3"
+										loading="lazy"
+									/>
+								</div>
+							)}
+						</div>
+					</div>
+				)
+			}
+
+			<!-- DIV 5: Links (se presenti) -->
+			{(film.LINK1 || film.LINK2 || film.LINK3) && (
+				<div class="section-links">
+					<div class="links-left">
+						<span class="info-label">Links:</span>
+					</div>
+					<div class="links-right">
+						<div class="links-list">
+							{film.LINK1 && (
+								<a href={film.LINK1} target="_blank" rel="noopener noreferrer" class="link-item">
+									{film.LINK1}
+								</a>
+							)}
+							{film.LINK2 && (
+								<a href={film.LINK2} target="_blank" rel="noopener noreferrer" class="link-item">
+									{film.LINK2}
+								</a>
+							)}
+							{film.LINK3 && (
+								<a href={film.LINK3} target="_blank" rel="noopener noreferrer" class="link-item">
+									{film.LINK3}
+								</a>
+							)}
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 		<Footer />
 
 		<script>
-			// Custom cursor
-			const cursor = document.getElementById("custom-cursor");
-
-			document.addEventListener("mousemove", e => {
-				if (!cursor) return;
-
-				cursor.style.left = e.clientX + "px";
-				cursor.style.top = e.clientY + "px";
-
-				// Temporarily hide cursor to detect element underneath
-				cursor.style.pointerEvents = "none";
-				const elementUnderCursor = document.elementFromPoint(
-					e.clientX,
-					e.clientY
-				);
-				cursor.style.pointerEvents = "none"; // Keep it none
-
-				// Check if it's an interactive element
-				if (elementUnderCursor && elementUnderCursor !== cursor) {
-					const isInteractive =
-						elementUnderCursor.tagName === "BUTTON" ||
-						elementUnderCursor.tagName === "A" ||
-						elementUnderCursor.tagName === "INPUT" ||
-						elementUnderCursor.tagName === "SELECT" ||
-						elementUnderCursor.tagName === "TEXTAREA" ||
-						elementUnderCursor.closest("button, a, input, select, textarea");
-
-					if (isInteractive) {
-						cursor.classList.add("hover");
-					} else {
-						cursor.classList.remove("hover");
-					}
-				} else {
-					cursor.classList.remove("hover");
-				}
-			});
+			// Import custom cursor logic
+			import { initCustomCursor } from "../../scripts/customCursor.js";
+			initCustomCursor();
 		</script>
 	</body>
 </html>

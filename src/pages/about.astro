@@ -1,19 +1,18 @@
 ---
 import "../styles/style.css";
 import FilmHeader from "../components/FilmHeader.astro";
-import footerData from "../data/footer.json";
 ---
 
 <html lang="it">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta
 			name="description"
-			content="Pixar Viz — Archivio 3D e collection dedicata ai film Pixar. Informazioni sul progetto e sul team."
+			content="© Pixar 3D ARCHIVE — Archivio 3D e collection dedicata ai film Pixar. Informazioni sul progetto e sul team."
 		/>
-		<title>About — Pixar Viz</title>
+		<title>About — © Pixar 3D ARCHIVE</title>
 	</head>
 
 	<body>
@@ -23,15 +22,24 @@ import footerData from "../data/footer.json";
 		<main class="about-page">
 			<div class="about-left">
 				<div class="about-grid">
-					<span class="about-label">Projects:</span>
+					<span class="about-label">Project:</span>
 					<span class="about-value"
 						>Politecnico di Milano <br /> Cultura dell'immagine digitale <br /> A.A.
 						2025/2026</span
 					>
 
-					<span class="about-label">Group:</span>
+					<span class="about-label">Web Design:</span>
 					<div class="about-value">
-						{footerData.Nomi.map(nome => <div>{nome}</div>)}
+						Tommaso Patrini <br /> Federico Morsia
+					</div>
+
+					<span class="about-label">Web Dev:</span>
+					<div class="about-value">Federico Morsia</div>
+
+					<span class="about-label">Research:</span>
+					<div class="about-value">
+						Chiara Preaialmini <br /> Renata Romagnuolo <br /> Federico Schinoppi
+						<br /> Valentina Giupponi <br /> Elisa Ruggieri
 					</div>
 
 					<span class="about-label">Professors:</span>
@@ -67,42 +75,9 @@ import footerData from "../data/footer.json";
 		</main>
 
 		<script>
-			// Custom cursor
-			const cursor = document.getElementById("custom-cursor");
-
-			document.addEventListener("mousemove", e => {
-				if (!cursor) return;
-
-				cursor.style.left = e.clientX + "px";
-				cursor.style.top = e.clientY + "px";
-
-				// Temporarily hide cursor to detect element underneath
-				cursor.style.pointerEvents = "none";
-				const elementUnderCursor = document.elementFromPoint(
-					e.clientX,
-					e.clientY
-				);
-				cursor.style.pointerEvents = "none"; // Keep it none
-
-				// Check if it's an interactive element
-				if (elementUnderCursor && elementUnderCursor !== cursor) {
-					const isInteractive =
-						elementUnderCursor.tagName === "BUTTON" ||
-						elementUnderCursor.tagName === "A" ||
-						elementUnderCursor.tagName === "INPUT" ||
-						elementUnderCursor.tagName === "SELECT" ||
-						elementUnderCursor.tagName === "TEXTAREA" ||
-						elementUnderCursor.closest("button, a, input, select, textarea");
-
-					if (isInteractive) {
-						cursor.classList.add("hover");
-					} else {
-						cursor.classList.remove("hover");
-					}
-				} else {
-					cursor.classList.remove("hover");
-				}
-			});
+			// Import custom cursor logic
+			import { initCustomCursor } from "../scripts/customCursor.js";
+			initCustomCursor();
 		</script>
 
 		<style>

@@ -62,7 +62,7 @@
 	
 	/* Font Sizes */
 	/* Used in: Header, Footer, FilmHeader, MusicPlayer, ArchiveTable, Filters, About page */
-	--font-size: 0.8rem;
+	--font-size: 1rem;
 	
 	/* Used in: Gallery3D image info (film/anno), unused in other contexts */
 	--font-size-small: 1rem;
@@ -74,17 +74,11 @@
 	--font-size-large: 4rem;
 	
 	/* Font Weights */
-	/* Used in: Header links/title, Footer text, FilmHeader, ArchiveTable, Filters, Gallery3D innovation box, About labels */
+	/* All text weights unified to 600 */
 	--font-weight-semibold: 600;
-	
-	/* Used in: Gallery3D innovation box */
-	--font-weight-medium: 500;
-	
-	/* Used in: Film detail (character h1, plot h2, innovation value), Gallery3D personaggio, ArchiveTable items, Gallery placeholder */
-	--font-weight-bold: 700;
-	
-	/* Used in: Film detail (info-value, plot p, innovation description), About values/text */
-	--font-weight-regular: 400;
+	--font-weight-medium: 600;
+	--font-weight-bold: 600;
+	--font-weight-regular: 600;
 	
 	/* Line Heights */
 	/* Used in: Film detail (character h1) */
@@ -94,7 +88,7 @@
 	--line-height-normal: 1.4;
 	
 	/* Used in: Film detail (plot p, innovation description), About text */
-	--line-height-relaxed: 1.6;
+	--line-height-relaxed: 1.2;
 	
 	/* Used in: Gallery3D innovation box */
 	--line-height-compact: 1;

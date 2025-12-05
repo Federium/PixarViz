@@ -10,7 +10,7 @@ import MusicPlayer from "../components/MusicPlayer.astro";
 <html lang="it">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,7 +19,7 @@ import MusicPlayer from "../components/MusicPlayer.astro";
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
 			rel="stylesheet"
 		/>
-		<title>Pixar Viz</title>
+		<title>© Pixar 3D ARCHIVE</title>
 	</head>
 	<body>
 		<div id="custom-cursor"></div>
@@ -37,66 +37,11 @@ import MusicPlayer from "../components/MusicPlayer.astro";
 		<MusicPlayer />
 
 		<script>
-			// Custom cursor
-			const cursor = document.getElementById("custom-cursor");
-			let is3DHovering = false;
-			let mouseX = 0;
-			let mouseY = 0;
-			let cursorX = 0;
-			let cursorY = 0;
+			// Import custom cursor logic
+			import { initCustomCursor } from "../scripts/customCursor.js";
+			initCustomCursor();
 
-			// Listen for 3D hover events from Gallery3D
-			window.addEventListener("3d-hover", ((e: CustomEvent) => {
-				is3DHovering = e.detail.isHovering;
-			}) as EventListener);
-
-			document.addEventListener("mousemove", e => {
-				mouseX = e.clientX;
-				mouseY = e.clientY;
-
-				// Get element under cursor (cursor has pointer-events: none so it's ignored)
-				const elementUnderCursor = document.elementFromPoint(
-					e.clientX,
-					e.clientY
-				);
-
-				// Check if it's an interactive element
-				let isInteractive = false;
-
-				if (elementUnderCursor && elementUnderCursor !== cursor) {
-					isInteractive =
-						elementUnderCursor.tagName === "BUTTON" ||
-						elementUnderCursor.tagName === "A" ||
-						elementUnderCursor.tagName === "INPUT" ||
-						elementUnderCursor.tagName === "SELECT" ||
-						elementUnderCursor.tagName === "TEXTAREA" ||
-						!!elementUnderCursor.closest("button, a, input, select, textarea");
-				}
-
-				// Also consider 3D hover state
-				if (isInteractive || is3DHovering) {
-					cursor?.classList.add("hover");
-				} else {
-					cursor?.classList.remove("hover");
-				}
-			});
-
-			// Smooth follow animation
-			function animateCursor() {
-				if (!cursor) return;
-
-				// Interpolate cursor position with delay (lerp)
-				const speed = 0.15; // Lower = more delay
-				cursorX += (mouseX - cursorX) * speed;
-				cursorY += (mouseY - cursorY) * speed;
-
-				cursor.style.left = cursorX + "px";
-				cursor.style.top = cursorY + "px";
-
-				requestAnimationFrame(animateCursor);
-			}
-
-			animateCursor(); // Toggle view logic - listen to events from Header component
+			// Toggle view logic - listen to events from Header component
 			const galleryView = document.getElementById("gallery-view");
 			const archiveView = document.getElementById("archive-view");
 

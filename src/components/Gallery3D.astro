@@ -11,7 +11,9 @@ const processedData = galleryData.map((item, index) => {
 	const film = raw["Film/corto"] || "";
 	const anno = raw.Anno || "";
 	const innovazione = raw["Nome Innovazione 1"] || "";
+	const innovazione2 = raw["Nome Innovazione 2"] || "";
 	const category = raw["Categoria Innovazione (tag) 1"] || "";
+	const category2 = raw["Categoria Innovazione (tag) 2"] || "";
 
 	// Prefer `Copertina` if present, otherwise fall back to first ImgXX
 	let src = raw.Copertina || "";
@@ -35,7 +37,9 @@ const processedData = galleryData.map((item, index) => {
 		FILM: film,
 		ANNO: anno,
 		INNOVAZIONE: innovazione,
+		INNOVAZIONE2: innovazione2,
 		CATEGORY: category,
+		CATEGORY2: category2,
 		SRC: src,
 		optimizedSrc: nameWithoutExt ? `/images/${nameWithoutExt}.webp` : "",
 		raw: raw,
@@ -47,6 +51,7 @@ const processedData = galleryData.map((item, index) => {
 <div id="image-info">
 	<div id="image-personaggio"></div>
 	<div id="image-innovazione-box" class="innovation-tag"></div>
+	<div id="image-innovazione-box2" class="innovation-tag"></div>
 	<div class="image-details">
 		<div id="image-film"></div>
 		<div id="image-anno"></div>
@@ -74,19 +79,14 @@ const processedData = galleryData.map((item, index) => {
 		</svg>
 	</button>
 	<div id="filter-options-container" class="filter-options-container hidden">
-		<button class="filter-button active" data-category="all">Tutte</button>
-		<button class="filter-button" data-category="Movimento">Movimento</button>
+		<button class="filter-button active" data-category="all">All</button>
 		<button class="filter-button" data-category="Motion">Motion</button>
-		<button class="filter-button" data-category="Luci">Luci</button>
-		<button class="filter-button" data-category="Lights">Lights</button>
-		<button class="filter-button" data-category="Modellazione"
-			>Modellazione</button
-		>
-		<button class="filter-button" data-category="Modeling">Modeling</button>
+		<button class="filter-button" data-category="Light">Light</button>
+		<button class="filter-button" data-category="Modelling">Modelling</button>
 		<button class="filter-button" data-category="Texture">Texture</button>
-		<button class="filter-button" data-category="Sfondo">Sfondo</button>
 		<button class="filter-button" data-category="Background">Background</button>
 		<button class="filter-button" data-category="Materials">Materials</button>
+		<button class="filter-button" data-category="Simulation">Simulation</button>
 	</div>
 </div>
 
@@ -137,6 +137,7 @@ const processedData = galleryData.map((item, index) => {
 		currentZ: number;
 		delay: number;
 		category: string;
+		category2: string;
 		isVisible: boolean;
 	}[] = [];
 
@@ -264,7 +265,9 @@ const processedData = galleryData.map((item, index) => {
 					film: item.FILM,
 					anno: item.ANNO,
 					innovazione: item.INNOVAZIONE,
+					innovazione2: item.INNOVAZIONE2,
 					category: item.CATEGORY,
+					category2: item.CATEGORY2,
 				};
 
 				scene.add(mesh);
@@ -284,6 +287,7 @@ const processedData = galleryData.map((item, index) => {
 					currentZ: startZ,
 					delay: delay,
 					category: item.CATEGORY || "",
+					category2: item.CATEGORY2 || "",
 					isVisible: true,
 				});
 			});
@@ -341,8 +345,11 @@ const processedData = galleryData.map((item, index) => {
 	function applyFilter(selectedCategory: string) {
 		imageData.forEach(data => {
 			const category = data.category || "";
+			const category2 = data.category2 || "";
 			const shouldBeVisible =
-				selectedCategory === "all" || category.includes(selectedCategory);
+				selectedCategory === "all" ||
+				category.includes(selectedCategory) ||
+				category2.includes(selectedCategory);
 
 			const material = data.mesh.material as THREE.MeshBasicMaterial;
 
@@ -415,6 +422,7 @@ const processedData = galleryData.map((item, index) => {
 	const personaggioElement = document.getElementById("image-personaggio");
 	const filmElement = document.getElementById("image-film");
 	const innovazioneElement = document.getElementById("image-innovazione-box");
+	const innovazione2Element = document.getElementById("image-innovazione-box2");
 	const annoElement = document.getElementById("image-anno");
 
 	// Event listener per il mouse
@@ -442,8 +450,17 @@ const processedData = galleryData.map((item, index) => {
 				filmElement.textContent = `Film: ${hoveredMesh.userData.film}`;
 			if (innovazioneElement)
 				innovazioneElement.textContent = hoveredMesh.userData.innovazione || "";
+			if (innovazione2Element) {
+				innovazione2Element.textContent =
+					hoveredMesh.userData.innovazione2 || "";
+				if (hoveredMesh.userData.innovazione2) {
+					innovazione2Element.style.display = "inline-block";
+				} else {
+					innovazione2Element.style.display = "none";
+				}
+			}
 			if (annoElement)
-				annoElement.textContent = `Anno: ${hoveredMesh.userData.anno}`;
+				annoElement.textContent = `Year: ${hoveredMesh.userData.anno}`;
 			titleElement.classList.add("visible");
 		} else if (titleElement) {
 			titleElement.classList.remove("visible");
