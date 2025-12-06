@@ -156,7 +156,9 @@ const musicFiles = [
 
 <div id="music-player">
 	<div class="player-left">
-		<span id="track-name">—</span>
+		<div class="track-name-container">
+			<span id="track-name" class="track-name-text">—</span>
+		</div>
 		<span id="music-indicator" class="music-indicator">
 			<span class="bar"></span>
 			<span class="bar"></span>
@@ -192,8 +194,8 @@ const musicFiles = [
 		left: 0;
 		right: 0;
 		width: 100vw;
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 300px 1fr 300px;
 		align-items: center;
 		padding: 1rem 1rem;
 		z-index: 1000;
@@ -204,7 +206,6 @@ const musicFiles = [
 	.player-left,
 	.player-center,
 	.player-right {
-		flex: 1;
 		display: flex;
 		align-items: center;
 	}
@@ -212,6 +213,42 @@ const musicFiles = [
 	.player-left {
 		justify-content: flex-start;
 		gap: 0.5rem;
+	}
+
+	.track-name-container {
+		flex: 1;
+		overflow: hidden;
+		position: relative;
+		white-space: nowrap;
+	}
+
+	.track-name-text {
+		font-family: var(--font-family);
+		font-size: var(--font-size);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-text-primary);
+		user-select: none;
+		display: inline-block;
+		white-space: nowrap;
+	}
+
+	.track-name-container.scrolling .track-name-text {
+		animation: scroll-text linear infinite;
+	}
+
+	@keyframes scroll-text {
+		0% {
+			transform: translateX(0);
+		}
+		50% {
+			transform: translateX(-100%);
+		}
+		50.01% {
+			transform: translateX(100%);
+		}
+		100% {
+			transform: translateX(0);
+		}
 	}
 
 	.music-indicator {
@@ -266,14 +303,6 @@ const musicFiles = [
 	.player-right {
 		justify-content: flex-end;
 		gap: 0.5rem;
-	}
-
-	#track-name {
-		font-family: var(--font-family);
-		font-size: var(--font-size);
-		font-weight: var(--font-weight-semibold);
-		color: var(--color-text-primary);
-		user-select: none;
 	}
 
 	.control-btn {
@@ -491,11 +520,31 @@ const musicFiles = [
 
 	const audio = document.getElementById("audio-element") as HTMLAudioElement;
 	const trackName = document.getElementById("track-name");
+	const trackNameContainer = document.querySelector(".track-name-container");
 	const playPauseBtn = document.getElementById("play-pause-btn");
 	const prevBtn = document.getElementById("prev-btn");
 	const nextBtn = document.getElementById("next-btn");
 	const volumeBtn = document.getElementById("volume-btn");
 	const musicIndicator = document.getElementById("music-indicator");
+
+	// Funzione per controllare se il testo va in overflow e attivare lo scroll
+	function checkTextOverflow() {
+		if (!trackName || !trackNameContainer) return;
+
+		const containerWidth = trackNameContainer.offsetWidth;
+		const textWidth = trackName.offsetWidth;
+
+		if (textWidth > containerWidth) {
+			// Testo troppo lungo - attiva lo scroll
+			trackNameContainer.classList.add("scrolling");
+			// Calcola la durata basata sulla lunghezza del testo
+			const duration = textWidth / 50; // ~50px al secondo
+			trackName.style.animationDuration = `${duration}s`;
+		} else {
+			// Testo si adatta - disattiva lo scroll
+			trackNameContainer.classList.remove("scrolling");
+		}
+	}
 
 	// Carica la traccia corrente
 	function loadTrack(index: number) {
@@ -503,10 +552,14 @@ const musicFiles = [
 
 		const track = musicFiles[index];
 		audio.src = track.src;
+		const displayText = `${track.name} — ${track.artist} [${track.film}]`;
 		if (trackName) {
-			trackName.textContent = `${track.name} — ${track.artist} [${track.film}]`;
+			trackName.textContent = displayText;
 		}
 		audio.volume = isMuted ? 0 : defaultVolume;
+
+		// Controlla overflow dopo un breve delay per permettere al DOM di aggiornarsi
+		setTimeout(checkTextOverflow, 100);
 	}
 
 	// Aggiorna l'icona del volume
