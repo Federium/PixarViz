@@ -531,8 +531,8 @@ const musicFiles = [
 	function checkTextOverflow() {
 		if (!trackName || !trackNameContainer) return;
 
-		const containerWidth = trackNameContainer.offsetWidth;
-		const textWidth = trackName.offsetWidth;
+		const containerWidth = (trackNameContainer as HTMLElement).offsetWidth;
+		const textWidth = (trackName as HTMLElement).offsetWidth;
 
 		if (textWidth > containerWidth) {
 			// Testo troppo lungo - attiva lo scroll
