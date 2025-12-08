@@ -14,9 +14,11 @@ interface Film {
 	TECHNIQUE: string | null;
 	DESCRIPTION: string | null;
 	CATEGORY: string;
+	SPECIFIC_INFO: string | null;
 	TECHNIQUE2: string | null;
 	DESCRIPTION2: string | null;
 	CATEGORY2: string;
+	SPECIFIC_INFO2: string | null;
 	DIRECTOR: string | null;
 	PLOT: string | null;
 	LINK1: string | null;
@@ -102,9 +104,12 @@ export async function getStaticPaths() {
 			TECHNIQUE: raw["Nome Innovazione 1"] || null,
 			DESCRIPTION: raw["Paragrafo motivazione innovazione 1"] || null,
 			CATEGORY: raw["Categoria Innovazione (tag) 1"] || "",
+			SPECIFIC_INFO: raw["Info specifiche sul funzionamento 1"] || null,
 			TECHNIQUE2: raw["Nome Innovazione 2"] || null,
 			DESCRIPTION2: raw["Paragrafo Funzionamento generale 2"] || null,
 			CATEGORY2: raw["Categoria Innovazione (tag) 2"] || "",
+			SPECIFIC_INFO2:
+				raw["Funzionamento - info maggiori su tecnologie 2"] || null,
 			DIRECTOR: raw["Regista/autore"] || null,
 			PLOT: raw.Trama || null,
 			LINK1: raw["Link 1"] || null,
@@ -142,6 +147,30 @@ interface Props {
 }
 
 const { film } = Astro.props as Props;
+
+// Funzione per convertire link YouTube in embed URL
+function getYouTubeEmbedUrl(url: string | null): string | null {
+	if (!url) return null;
+
+	// Estrai l'ID del video da vari formati di URL YouTube
+	const patterns = [
+		/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\?\/]+)/,
+		/youtube\.com\/embed\/([^&\?\/]+)/,
+	];
+
+	for (const pattern of patterns) {
+		const match = url.match(pattern);
+		if (match && match[1]) {
+			return `https://www.youtube.com/embed/${match[1]}`;
+		}
+	}
+
+	return null;
+}
+
+const embedUrl1 = getYouTubeEmbedUrl(film.LINK1);
+const embedUrl2 = getYouTubeEmbedUrl(film.LINK2);
+const embedUrl3 = getYouTubeEmbedUrl(film.LINK3);
 
 import "../../styles/style.css";
 import "../../styles/film-detail.css";
@@ -258,7 +287,37 @@ import Footer from "../../components/Footer.astro";
 							</div>
 						)
 					}
+					{
+						film.SPECIFIC_INFO && (
+							<div class="innovazione-description">
+								<p>{film.SPECIFIC_INFO}</p>
+							</div>
+						)
+					}
 				</div>
+				{
+					film.TECHNIQUE2 && (
+						<>
+							<div class="innovation-divider" />
+							<div class="innovazione-left">
+								<span class="info-label">Innovation 2:</span>
+								<span class="info-value">{film.TECHNIQUE2}</span>
+							</div>
+							<div class="innovazione-right">
+								{film.DESCRIPTION2 && (
+									<div class="innovazione-description">
+										<p>{film.DESCRIPTION2}</p>
+									</div>
+								)}
+								{film.SPECIFIC_INFO2 && (
+									<div class="innovazione-description">
+										<p>{film.SPECIFIC_INFO2}</p>
+									</div>
+								)}
+							</div>
+						</>
+					)
+				}
 				<div class="innovazione-gallery">
 					{
 						film.img01Src && (
@@ -293,97 +352,83 @@ import Footer from "../../components/Footer.astro";
 							</div>
 						)
 					}
+					{
+						film.img04Src && (
+							<div class="gallery-img1">
+								<img
+									src={film.img04Src}
+									alt="Innovation 2 image 1"
+									loading="lazy"
+								/>
+							</div>
+						)
+					}
+					{
+						film.img05Src && (
+							<div class="gallery-img2">
+								<img
+									src={film.img05Src}
+									alt="Innovation 2 image 2"
+									loading="lazy"
+								/>
+							</div>
+						)
+					}
+					{
+						film.img06Src && (
+							<div class="gallery-img3">
+								<img
+									src={film.img06Src}
+									alt="Innovation 2 image 3"
+									loading="lazy"
+								/>
+							</div>
+						)
+					}
 				</div>
 			</div>
 
-			<!-- DIV 4: Innovazione 2 (se presente) -->
-			{
-				film.TECHNIQUE2 && (
-					<div class="section-innovazione">
-						<div class="innovazione-left">
-							<span class="info-label">Innovation 2:</span>
-							<span class="info-value">{film.TECHNIQUE2}</span>
-						</div>
-						<div class="innovazione-right">
-							{film.DESCRIPTION2 && (
-								<div class="innovazione-description">
-									<p>{film.DESCRIPTION2}</p>
-								</div>
-							)}
-						</div>
-						<div class="innovazione-gallery">
-							{film.img04Src && (
-								<div class="gallery-img1">
-									<img
-										src={film.img04Src}
-										alt="Innovation 2 image 1"
-										loading="lazy"
-									/>
-								</div>
-							)}
-							{film.img05Src && (
-								<div class="gallery-img2">
-									<img
-										src={film.img05Src}
-										alt="Innovation 2 image 2"
-										loading="lazy"
-									/>
-								</div>
-							)}
-							{film.img06Src && (
-								<div class="gallery-img3">
-									<img
-										src={film.img06Src}
-										alt="Innovation 2 image 3"
-										loading="lazy"
-									/>
-								</div>
-							)}
-						</div>
-					</div>
-				)
-			}
-
 			<!-- DIV 5: Links (se presenti) -->
 			{
-				(film.LINK1 || film.LINK2 || film.LINK3) && (
+				(embedUrl1 || embedUrl2 || embedUrl3) && (
 					<div class="section-links">
 						<div class="links-left">
-							<span class="info-label">Links:</span>
+							<span class="info-label">Media:</span>
 						</div>
-						<div class="links-right">
-							<div class="links-list">
-								{film.LINK1 && (
-									<a
-										href={film.LINK1}
-										target="_blank"
-										rel="noopener noreferrer"
-										class="link-item"
-									>
-										{film.LINK1}
-									</a>
-								)}
-								{film.LINK2 && (
-									<a
-										href={film.LINK2}
-										target="_blank"
-										rel="noopener noreferrer"
-										class="link-item"
-									>
-										{film.LINK2}
-									</a>
-								)}
-								{film.LINK3 && (
-									<a
-										href={film.LINK3}
-										target="_blank"
-										rel="noopener noreferrer"
-										class="link-item"
-									>
-										{film.LINK3}
-									</a>
-								)}
-							</div>
+						<div class="links-content">
+							{embedUrl1 && (
+								<div class="embed-container">
+									<iframe
+										src={embedUrl1}
+										title="YouTube video player"
+										frameborder="0"
+										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+										allowfullscreen
+									/>
+								</div>
+							)}
+							{embedUrl2 && (
+								<div class="embed-container">
+									<iframe
+										src={embedUrl2}
+										title="YouTube video player"
+										frameborder="0"
+										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+										allowfullscreen
+									/>
+								</div>
+							)}
+							{embedUrl3 && (
+								<div class="embed-container">
+									<iframe
+										src={embedUrl3}
+										title="YouTube video player"
+										frameborder="0"
+										allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+										allowfullscreen
+									/>
+								</div>
+							)}
 						</div>
 					</div>
 				)
