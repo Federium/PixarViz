@@ -1,5 +1,11 @@
 ---
 import rawData from "../../data/pixar_archivio.json";
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import "../../styles/style.css";
+import "../../styles/film-detail.css";
+import FilmHeader from "../../components/FilmHeader.astro";
+import Footer from "../../components/Footer.astro";
 
 interface Film {
 	ID: number;
@@ -7,10 +13,14 @@ interface Film {
 	CHARACTER: string | null;
 	FILM_NAME: string | null;
 	YEAR: number | null;
-	SRC: string;
-	optimizedSrc: string;
+	coverSrc: string;
 	posterSrc: string;
-	optimizedPosterSrc: string;
+	img01Src: string;
+	img02Src: string;
+	img03Src: string;
+	img04Src: string;
+	img05Src: string;
+	img06Src: string;
 	TECHNIQUE: string | null;
 	DESCRIPTION: string | null;
 	CATEGORY: string;
@@ -24,12 +34,6 @@ interface Film {
 	LINK1: string | null;
 	LINK2: string | null;
 	LINK3: string | null;
-	img01Src: string;
-	img02Src: string;
-	img03Src: string;
-	img04Src: string;
-	img05Src: string;
-	img06Src: string;
 }
 
 export async function getStaticPaths() {
@@ -38,54 +42,28 @@ export async function getStaticPaths() {
 		const name =
 			raw["Film/corto"] || raw["Personaggio/soggetto"] || `Film ${index + 1}`;
 
-		// Prefer Copertina for cover, otherwise look for first ImgXX
+		// Prefer Copertina for cover
 		let coverSrc = raw.Copertina || "";
 		if (!coverSrc) {
-			for (let i = 1; i <= 10; i++) {
-				const key = `Img${String(i).padStart(2, "0")}`;
+			let imgIndex = 1;
+			while (imgIndex <= 10) {
+				const key = `Img${String(imgIndex).padStart(2, "0")}`;
 				if (raw[key]) {
 					coverSrc = raw[key];
 					break;
 				}
+				imgIndex++;
 			}
 		}
 
-		// Get Poster for film info section
-		let posterSrc = raw.Poster || "";
-
-		const extPattern = new RegExp("\\.(jpg|jpeg|png|webp|avif)$", "i");
-
-		const coverFilename = coverSrc ? coverSrc.split("/").pop() || "" : "";
-		const coverNameWithoutExt = coverFilename.replace(extPattern, "");
-
-		const posterFilename = posterSrc ? posterSrc.split("/").pop() || "" : "";
-		const posterNameWithoutExt = posterFilename.replace(extPattern, "");
-
-		// Get innovation images (Img01, Img02, Img03)
-		const img01 = raw.Img01 || "";
-		const img02 = raw.Img02 || "";
-		const img03 = raw.Img03 || "";
-		const img04 = raw.Img04 || "";
-		const img05 = raw.Img05 || "";
-		const img06 = raw.Img06 || "";
-
-		const img01Filename = img01 ? img01.split("/").pop() || "" : "";
-		const img01NameWithoutExt = img01Filename.replace(extPattern, "");
-
-		const img02Filename = img02 ? img02.split("/").pop() || "" : "";
-		const img02NameWithoutExt = img02Filename.replace(extPattern, "");
-
-		const img03Filename = img03 ? img03.split("/").pop() || "" : "";
-		const img03NameWithoutExt = img03Filename.replace(extPattern, "");
-
-		const img04Filename = img04 ? img04.split("/").pop() || "" : "";
-		const img04NameWithoutExt = img04Filename.replace(extPattern, "");
-
-		const img05Filename = img05 ? img05.split("/").pop() || "" : "";
-		const img05NameWithoutExt = img05Filename.replace(extPattern, "");
-
-		const img06Filename = img06 ? img06.split("/").pop() || "" : "";
-		const img06NameWithoutExt = img06Filename.replace(extPattern, "");
+		// Tutte le immagini mantengono il percorso originale da src/assets
+		const posterSrc = raw.Poster || "";
+		const img01Src = raw.Img01 || "";
+		const img02Src = raw.Img02 || "";
+		const img03Src = raw.Img03 || "";
+		const img04Src = raw.Img04 || "";
+		const img05Src = raw.Img05 || "";
+		const img06Src = raw.Img06 || "";
 
 		return {
 			ID: raw.ID ?? index + 1,
@@ -93,14 +71,14 @@ export async function getStaticPaths() {
 			CHARACTER: raw["Personaggio/soggetto"] || null,
 			FILM_NAME: raw["Film/corto"] || null,
 			YEAR: raw.Anno || null,
-			SRC: coverSrc,
-			optimizedSrc: coverNameWithoutExt
-				? `/images/${coverNameWithoutExt}.webp`
-				: "",
+			coverSrc: coverSrc,
 			posterSrc: posterSrc,
-			optimizedPosterSrc: posterNameWithoutExt
-				? `/images/${posterNameWithoutExt}.webp`
-				: "",
+			img01Src: img01Src,
+			img02Src: img02Src,
+			img03Src: img03Src,
+			img04Src: img04Src,
+			img05Src: img05Src,
+			img06Src: img06Src,
 			TECHNIQUE: raw["Nome Innovazione 1"] || null,
 			DESCRIPTION: raw["Paragrafo motivazione innovazione 1"] || null,
 			CATEGORY: raw["Categoria Innovazione (tag) 1"] || "",
@@ -115,24 +93,6 @@ export async function getStaticPaths() {
 			LINK1: raw["Link 1"] || null,
 			LINK2: raw["Link 2"] || null,
 			LINK3: raw["Link 3"] || null,
-			img01Src: img01NameWithoutExt
-				? `/images/${img01NameWithoutExt}.webp`
-				: "",
-			img02Src: img02NameWithoutExt
-				? `/images/${img02NameWithoutExt}.webp`
-				: "",
-			img03Src: img03NameWithoutExt
-				? `/images/${img03NameWithoutExt}.webp`
-				: "",
-			img04Src: img04NameWithoutExt
-				? `/images/${img04NameWithoutExt}.webp`
-				: "",
-			img05Src: img05NameWithoutExt
-				? `/images/${img05NameWithoutExt}.webp`
-				: "",
-			img06Src: img06NameWithoutExt
-				? `/images/${img06NameWithoutExt}.webp`
-				: "",
 		};
 	});
 
@@ -148,6 +108,43 @@ interface Props {
 
 const { film } = Astro.props as Props;
 
+// Funzione helper per importare dinamicamente le immagini
+const images = import.meta.glob<{ default: ImageMetadata }>(
+	"/src/assets/**/*.{jpeg,jpg,png,gif,webp,avif}"
+);
+
+async function getImageSrc(path: string) {
+	if (!path) return null;
+	// Rimuovi "assets/" se presente all'inizio del path
+	const cleanPath = path.startsWith("assets/")
+		? path.substring("assets/".length)
+		: path;
+	const fullPath = `/src/assets/${cleanPath}`;
+
+	// Prova con diverse estensioni
+	const extensions = [".jpg", ".jpeg", ".png", ".webp", ".avif"];
+	let idx = 0;
+	while (idx < extensions.length) {
+		const ext = extensions[idx];
+		const pathWithExt = fullPath.includes(".") ? fullPath : fullPath + ext;
+		if (images[pathWithExt]) {
+			return (await images[pathWithExt]()).default;
+		}
+		idx++;
+	}
+	return null;
+}
+
+// Importa le immagini
+const coverImage = film.coverSrc ? await getImageSrc(film.coverSrc) : null;
+const posterImage = film.posterSrc ? await getImageSrc(film.posterSrc) : null;
+const img01Image = film.img01Src ? await getImageSrc(film.img01Src) : null;
+const img02Image = film.img02Src ? await getImageSrc(film.img02Src) : null;
+const img03Image = film.img03Src ? await getImageSrc(film.img03Src) : null;
+const img04Image = film.img04Src ? await getImageSrc(film.img04Src) : null;
+const img05Image = film.img05Src ? await getImageSrc(film.img05Src) : null;
+const img06Image = film.img06Src ? await getImageSrc(film.img06Src) : null;
+
 // Funzione per convertire link YouTube in embed URL
 function getYouTubeEmbedUrl(url: string | null): string | null {
 	if (!url) return null;
@@ -158,11 +155,14 @@ function getYouTubeEmbedUrl(url: string | null): string | null {
 		/youtube\.com\/embed\/([^&\?\/]+)/,
 	];
 
-	for (const pattern of patterns) {
+	let patternIdx = 0;
+	while (patternIdx < patterns.length) {
+		const pattern = patterns[patternIdx];
 		const match = url.match(pattern);
 		if (match && match[1]) {
 			return `https://www.youtube.com/embed/${match[1]}`;
 		}
+		patternIdx++;
 	}
 
 	return null;
@@ -171,11 +171,6 @@ function getYouTubeEmbedUrl(url: string | null): string | null {
 const embedUrl1 = getYouTubeEmbedUrl(film.LINK1);
 const embedUrl2 = getYouTubeEmbedUrl(film.LINK2);
 const embedUrl3 = getYouTubeEmbedUrl(film.LINK3);
-
-import "../../styles/style.css";
-import "../../styles/film-detail.css";
-import FilmHeader from "../../components/FilmHeader.astro";
-import Footer from "../../components/Footer.astro";
 ---
 
 <html lang="it">
@@ -199,8 +194,14 @@ import Footer from "../../components/Footer.astro";
 		<!-- Cover Image -->
 		<div class="cover-image">
 			{
-				film.optimizedSrc && (
-					<img src={film.optimizedSrc} alt={film.TITLE} loading="eager" />
+				coverImage && (
+					<Image
+						src={coverImage}
+						alt={film.TITLE}
+						loading="eager"
+						format="webp"
+						quality={85}
+					/>
 				)
 			}
 		</div>
@@ -253,13 +254,14 @@ import Footer from "../../components/Footer.astro";
 				</div>
 				<div class="film-image">
 					{
-						film.optimizedPosterSrc && (
-							<img
-								src={film.optimizedPosterSrc}
+						posterImage && (
+							<Image
+								src={posterImage}
 								alt={film.TITLE}
 								loading="eager"
-								width="400"
-								height="300"
+								width={400}
+								height={300}
+								format="webp"
 							/>
 						)
 					}
@@ -320,67 +322,73 @@ import Footer from "../../components/Footer.astro";
 				}
 				<div class="innovazione-gallery">
 					{
-						film.img01Src && (
+						img01Image && (
 							<div class="gallery-img1">
-								<img
-									src={film.img01Src}
+								<Image
+									src={img01Image}
 									alt="Innovation image 1"
 									loading="lazy"
+									format="webp"
 								/>
 							</div>
 						)
 					}
 					{
-						film.img02Src && (
+						img02Image && (
 							<div class="gallery-img2">
-								<img
-									src={film.img02Src}
+								<Image
+									src={img02Image}
 									alt="Innovation image 2"
 									loading="lazy"
+									format="webp"
 								/>
 							</div>
 						)
 					}
 					{
-						film.img03Src && (
+						img03Image && (
 							<div class="gallery-img3">
-								<img
-									src={film.img03Src}
+								<Image
+									src={img03Image}
 									alt="Innovation image 3"
 									loading="lazy"
+									format="webp"
 								/>
 							</div>
 						)
 					}
 					{
-						film.img04Src && (
+						img04Image && (
 							<div class="gallery-img1">
-								<img
-									src={film.img04Src}
+								<Image
+									src={img04Image}
 									alt="Innovation 2 image 1"
 									loading="lazy"
+									format="webp"
 								/>
 							</div>
 						)
 					}
 					{
-						film.img05Src && (
+						img05Image && (
 							<div class="gallery-img2">
-								<img
-									src={film.img05Src}
+								<Image
+									src={img05Image}
 									alt="Innovation 2 image 2"
 									loading="lazy"
+									format="webp"
 								/>
 							</div>
 						)
 					}
 					{
-						film.img06Src && (
+						img06Image && (
 							<div class="gallery-img3">
-								<img
-									src={film.img06Src}
+								<Image
+									src={img06Image}
 									alt="Innovation 2 image 3"
 									loading="lazy"
+									format="webp"
 								/>
 							</div>
 						)
