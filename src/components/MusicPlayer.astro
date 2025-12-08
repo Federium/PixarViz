@@ -514,9 +514,25 @@ const musicFiles = [
 		},
 	];
 
+	// Recupera lo stato salvato dal sessionStorage
+	const savedState = sessionStorage.getItem("musicPlayerState");
 	let currentTrackIndex = 0;
 	let isMuted = false;
+	let savedTime = 0;
+	let shouldAutoPlay = false;
 	const defaultVolume = 0.66; // Volume predefinito al 66%
+
+	if (savedState) {
+		try {
+			const state = JSON.parse(savedState);
+			currentTrackIndex = state.trackIndex || 0;
+			isMuted = state.isMuted || false;
+			savedTime = state.currentTime || 0;
+			shouldAutoPlay = state.isPlaying || false;
+		} catch (e) {
+			// Ignora errori di parsing
+		}
+	}
 
 	const audio = document.getElementById("audio-element") as HTMLAudioElement;
 	const trackName = document.getElementById("track-name");
@@ -526,6 +542,21 @@ const musicFiles = [
 	const nextBtn = document.getElementById("next-btn");
 	const volumeBtn = document.getElementById("volume-btn");
 	const musicIndicator = document.getElementById("music-indicator");
+
+	// Salva lo stato prima di navigare via dalla pagina
+	function savePlayerState() {
+		const state = {
+			trackIndex: currentTrackIndex,
+			currentTime: audio.currentTime,
+			isPlaying: !audio.paused,
+			isMuted: isMuted,
+		};
+		sessionStorage.setItem("musicPlayerState", JSON.stringify(state));
+	}
+
+	// Salva lo stato periodicamente e prima di lasciare la pagina
+	window.addEventListener("beforeunload", savePlayerState);
+	setInterval(savePlayerState, 1000); // Salva ogni secondo
 
 	// Funzione per controllare se il testo va in overflow e attivare lo scroll
 	function checkTextOverflow() {
@@ -547,7 +578,7 @@ const musicFiles = [
 	}
 
 	// Carica la traccia corrente
-	function loadTrack(index: number) {
+	function loadTrack(index: number, restoreTime: boolean = false) {
 		if (index < 0 || index >= musicFiles.length) return;
 
 		const track = musicFiles[index];
@@ -557,6 +588,17 @@ const musicFiles = [
 			trackName.textContent = displayText;
 		}
 		audio.volume = isMuted ? 0 : defaultVolume;
+
+		// Ripristina il tempo se richiesto
+		if (restoreTime && savedTime > 0) {
+			audio.addEventListener(
+				"loadedmetadata",
+				() => {
+					audio.currentTime = savedTime;
+				},
+				{ once: true }
+			);
+		}
 
 		// Controlla overflow dopo un breve delay per permettere al DOM di aggiornarsi
 		setTimeout(checkTextOverflow, 100);
@@ -579,9 +621,7 @@ const musicFiles = [
 					playPauseBtn.setAttribute("aria-label", "Pause");
 					musicIndicator?.classList.add("playing");
 				})
-				.catch(err => {
-					console.log("Playback error:", err);
-				});
+				.catch(() => {});
 		} else {
 			audio.pause();
 			playPauseBtn.textContent = "▶";
@@ -597,9 +637,7 @@ const musicFiles = [
 			(currentTrackIndex - 1 + musicFiles.length) % musicFiles.length;
 		loadTrack(currentTrackIndex);
 		if (wasPlaying) {
-			audio.play().catch(err => {
-				console.log("Playback error:", err);
-			});
+			audio.play().catch(() => {});
 		}
 	});
 
@@ -609,9 +647,7 @@ const musicFiles = [
 		currentTrackIndex = (currentTrackIndex + 1) % musicFiles.length;
 		loadTrack(currentTrackIndex);
 		if (wasPlaying) {
-			audio.play().catch(err => {
-				console.log("Playback error:", err);
-			});
+			audio.play().catch(() => {});
 		}
 	});
 
@@ -619,9 +655,7 @@ const musicFiles = [
 	audio.addEventListener("ended", () => {
 		currentTrackIndex = (currentTrackIndex + 1) % musicFiles.length;
 		loadTrack(currentTrackIndex);
-		audio.play().catch(err => {
-			console.log("Playback error:", err);
-		});
+		audio.play().catch(() => {});
 	});
 
 	// Volume control - toggle mute/unmute
@@ -632,26 +666,26 @@ const musicFiles = [
 	});
 
 	// Carica la prima traccia e avvia la riproduzione
-	loadTrack(currentTrackIndex);
+	loadTrack(currentTrackIndex, true); // true per ripristinare il tempo salvato
 	updateVolumeIcon();
 
-	// Auto-play al caricamento
-	audio.addEventListener(
-		"canplaythrough",
-		() => {
-			audio
-				.play()
-				.then(() => {
-					if (playPauseBtn) {
-						playPauseBtn.textContent = "■";
-						playPauseBtn.setAttribute("aria-label", "Pause");
-					}
-					musicIndicator?.classList.add("playing");
-				})
-				.catch(err => {
-					console.log("Auto-play bloccato dal browser:", err);
-				});
-		},
-		{ once: true }
-	);
+	// Auto-play al caricamento solo se era in riproduzione
+	if (shouldAutoPlay) {
+		audio.addEventListener(
+			"canplaythrough",
+			() => {
+				audio
+					.play()
+					.then(() => {
+						if (playPauseBtn) {
+							playPauseBtn.textContent = "■";
+							playPauseBtn.setAttribute("aria-label", "Pause");
+						}
+						musicIndicator?.classList.add("playing");
+					})
+					.catch(() => {});
+			},
+			{ once: true }
+		);
+	}
 </script>

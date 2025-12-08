@@ -210,10 +210,6 @@ const processedData = galleryData.map((item, index) => {
 			const numImages = data.length;
 			const spacing = 0.2;
 
-			console.log(
-				`Caricamento di ${numImages} immagini da dati pre-caricati...`
-			);
-
 			// Crea le immagini
 			data.forEach((item: any, i: number) => {
 				// Geometria rettangolare per l'immagine
@@ -223,9 +219,6 @@ const processedData = galleryData.map((item, index) => {
 					item.optimizedSrc || item.SRC,
 					// onLoad callback
 					loadedTexture => {
-						console.log(
-							`✅ Immagine caricata: ${item.PERSONAGGIO || item.FILM}`
-						);
 						// Ottimizzazioni texture
 						loadedTexture.minFilter = THREE.LinearFilter;
 						loadedTexture.magFilter = THREE.LinearFilter;
@@ -335,10 +328,6 @@ const processedData = galleryData.map((item, index) => {
 						firstYearImageData.originalZ
 					);
 					const label = createTimelineLabel(year.toString(), position);
-
-					console.log(
-						`Label ${year}: Z=${firstYearImageData.originalZ.toFixed(3)}, Image: ${firstYearImageData.mesh.userData.personaggio}`
-					);
 
 					// Imposta opacity iniziale a 0 per animazione fade-in
 					if (label.material instanceof THREE.MeshBasicMaterial) {
@@ -643,7 +632,6 @@ const processedData = galleryData.map((item, index) => {
 				requestAnimationFrame(updateTransition);
 			} else {
 				// Animazione completata, naviga alla pagina
-				console.log(`Navigazione a film/${filmId}`);
 				window.location.href = `/film/${filmId}`;
 			}
 		}
