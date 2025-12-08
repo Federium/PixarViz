@@ -164,7 +164,7 @@ const processedData = galleryData.map((item, index) => {
 		context.clearRect(0, 0, canvas.width, canvas.height);
 
 		// Testo con dimensione proporzionata alla risoluzione più alta
-		context.font = 'bold 72px "Helvetica Neue", Arial, sans-serif';
+		context.font = '600 72px "PP Mori", Arial, sans-serif';
 		context.fillStyle = "#000000";
 		context.textAlign = "center";
 		context.textBaseline = "middle";
@@ -180,7 +180,7 @@ const processedData = galleryData.map((item, index) => {
 			opacity: 0.9,
 			side: THREE.DoubleSide,
 		});
-		const geometry = new THREE.PlaneGeometry(1.2, 0.3);
+		const geometry = new THREE.PlaneGeometry(1.3, 0.3);
 		const mesh = new THREE.Mesh(geometry, material);
 
 		mesh.position.copy(position);
@@ -241,11 +241,12 @@ const processedData = galleryData.map((item, index) => {
 					}
 				);
 				const material = new THREE.MeshBasicMaterial({ map: texture });
-				const mesh = new THREE.Mesh(geometry, material); // Posizionamento finale con variazioni casuali
-				const finalX = (Math.random() - 0.01) * 0.01;
-				const finalY = -0.1 + (Math.random() - 0.01) * 0.01;
-				const finalZ =
-					(i - (numImages - 1) / 2) * spacing + (Math.random() - 0.2) * 0.08;
+				const mesh = new THREE.Mesh(geometry, material);
+
+				// Posizionamento finale senza variazioni casuali
+				const finalX = 0;
+				const finalY = -0.1;
+				const finalZ = (i - (numImages - 1) / 2) * spacing;
 
 				// Posizione iniziale (leggero spostamento in alto a destra)
 				const startX = finalX + 0.1;
@@ -298,34 +299,47 @@ const processedData = galleryData.map((item, index) => {
 				.filter((year): year is number => typeof year === "number" && year > 0)
 				.sort((a, b) => a - b);
 
-			// Seleziona circa 10 date distribuite uniformemente
-			const step = Math.max(1, Math.floor(uniqueYears.length / 10));
-			const selectedYears = uniqueYears
-				.filter((_, index) => index % step === 0)
-				.slice(0, 12);
+			// Seleziona anni: primo, ultimo, e circa 10 date centrali distribuite uniformemente
+			let selectedYears: number[] = [];
+			if (uniqueYears.length > 0) {
+				selectedYears.push(uniqueYears[0]); // Prima data
+
+				if (uniqueYears.length > 2) {
+					// Seleziona date centrali
+					const middleYears = uniqueYears.slice(1, -1);
+					const step = Math.max(1, Math.floor(middleYears.length / 10));
+					const middle = middleYears
+						.filter((_, index) => index % step === 0)
+						.slice(0, 10);
+					selectedYears.push(...middle);
+				}
+
+				if (uniqueYears.length > 1) {
+					selectedYears.push(uniqueYears[uniqueYears.length - 1]); // Ultima data
+				}
+			}
 
 			// Posiziona le etichette lungo l'asse Z
-			selectedYears.forEach((year: number, index) => {
-				// Trova la posizione Z media delle immagini di quell'anno
-				const yearImages = imageData.filter(img => {
-					const imgYear = data.find(
-						(d: any) => d.ID === img.mesh.userData.id
-					)?.ANNO;
-					return imgYear === year;
+			selectedYears.forEach((year: number) => {
+				// Trova la prima immagine di quell'anno usando imageData
+				const firstYearImageData = imageData.find(img => {
+					return img.mesh.userData.anno === year;
 				});
 
-				if (yearImages.length > 0) {
-					const avgZ =
-						yearImages.reduce((sum, img) => sum + img.originalZ, 0) /
-						yearImages.length;
-
-					// ////////// POSIZIONE L'ETICHETTA //////////
-					// ////////// POSIZIONE L'ETICHETTA //////////
-					// ////////// POSIZIONE L'ETICHETTA //////////
-					// ////////// POSIZIONE L'ETICHETTA //////////
-					// ////////// POSIZIONE L'ETICHETTA //////////
-					const position = new THREE.Vector3(2.4, -0.6, avgZ);
+				if (firstYearImageData) {
+					// Usa direttamente la posizione Z originale della mesh
+					// Riduci la distanza X per migliorare l'allineamento visivo in prospettiva
+					const position = new THREE.Vector3(
+						1.6,
+						-0.9,
+						firstYearImageData.originalZ
+					);
 					const label = createTimelineLabel(year.toString(), position);
+
+					console.log(
+						`Label ${year}: Z=${firstYearImageData.originalZ.toFixed(3)}, Image: ${firstYearImageData.mesh.userData.personaggio}`
+					);
+
 					// Imposta opacity iniziale a 0 per animazione fade-in
 					if (label.material instanceof THREE.MeshBasicMaterial) {
 						label.material.opacity = 0;
