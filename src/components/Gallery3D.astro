@@ -139,10 +139,25 @@ const processedData = galleryData.map((item, index) => {
 		category: string;
 		category2: string;
 		isVisible: boolean;
+		textureLoaded: boolean;
+		textureSrc: string;
 	}[] = [];
 
 	// Array per le etichette della timeline
 	const timelineLabels: THREE.Mesh[] = [];
+	
+	// Placeholder texture (1x1 pixel grigio chiaro)
+	const placeholderCanvas = document.createElement('canvas');
+	placeholderCanvas.width = 1;
+	placeholderCanvas.height = 1;
+	const ctx = placeholderCanvas.getContext('2d');
+	if (ctx) {
+		ctx.fillStyle = '#e0e0e0';
+		ctx.fillRect(0, 0, 1, 1);
+	}
+	const placeholderTexture = new THREE.CanvasTexture(placeholderCanvas);
+	placeholderTexture.minFilter = THREE.LinearFilter;
+	placeholderTexture.magFilter = THREE.LinearFilter;
 
 	// TextureLoader
 	const textureLoader = new THREE.TextureLoader();
@@ -210,30 +225,15 @@ const processedData = galleryData.map((item, index) => {
 			const numImages = data.length;
 			const spacing = 0.2;
 
-			// Crea le immagini
+			// Crea le immagini con placeholder
 			data.forEach((item: any, i: number) => {
 				// Geometria rettangolare per l'immagine
 				const geometry = new THREE.PlaneGeometry(2, 1.5);
 
-				const texture = textureLoader.load(
-					item.optimizedSrc || item.SRC,
-					// onLoad callback
-					loadedTexture => {
-						// Ottimizzazioni texture
-						loadedTexture.minFilter = THREE.LinearFilter;
-						loadedTexture.magFilter = THREE.LinearFilter;
-						loadedTexture.generateMipmaps = false;
-					},
-					// onProgress callback
-					undefined,
-					// onError callback
-					error => {
-						console.error(
-							`❌ Errore caricamento ${item.PERSONAGGIO || item.FILM}: ${item.SRC}`
-						);
-					}
-				);
-				const material = new THREE.MeshBasicMaterial({ map: texture });
+				// Usa placeholder inizialmente
+				const material = new THREE.MeshBasicMaterial({ 
+					map: placeholderTexture.clone()
+				});
 				const mesh = new THREE.Mesh(geometry, material);
 
 				// Posizionamento finale senza variazioni casuali
@@ -283,6 +283,8 @@ const processedData = galleryData.map((item, index) => {
 					category: item.CATEGORY || "",
 					category2: item.CATEGORY2 || "",
 					isVisible: true,
+					textureLoaded: false,
+					textureSrc: item.optimizedSrc || item.SRC,
 				});
 			});
 
@@ -343,6 +345,53 @@ const processedData = galleryData.map((item, index) => {
 		}
 	} // Carica le immagini
 	loadImages();
+	
+	// Lazy loading delle texture
+	// Carica solo le texture che sono vicine alla posizione della camera
+	function loadVisibleTextures() {
+		const cameraZ = camera.position.z;
+		const loadRange = 15; // Carica texture entro questo range dalla camera
+		
+		imageData.forEach(data => {
+			if (!data.textureLoaded && data.isVisible) {
+				const distance = Math.abs(data.mesh.position.z - cameraZ);
+				
+				// Carica se è nel range o se sta per diventare visibile
+				if (distance < loadRange) {
+					data.textureLoaded = true;
+					
+					textureLoader.load(
+						data.textureSrc,
+						// onLoad callback
+						loadedTexture => {
+							// Ottimizzazioni texture
+							loadedTexture.minFilter = THREE.LinearFilter;
+							loadedTexture.magFilter = THREE.LinearFilter;
+							loadedTexture.generateMipmaps = false;
+							
+							// Sostituisci il placeholder con la texture reale
+							const material = data.mesh.material as THREE.MeshBasicMaterial;
+							if (material.map) {
+								material.map.dispose();
+							}
+							material.map = loadedTexture;
+							material.needsUpdate = true;
+						},
+						// onProgress callback
+						undefined,
+						// onError callback
+						error => {
+							console.error(`❌ Errore caricamento texture: ${data.textureSrc}`);
+							data.textureLoaded = false; // Riprova
+						}
+					);
+				}
+			}
+		});
+	}
+	
+	// Carica le prime texture immediatamente
+	loadVisibleTextures();
 
 	// Gestione filtri per categoria
 	function applyFilter(selectedCategory: string) {
@@ -653,6 +702,9 @@ const processedData = galleryData.map((item, index) => {
 	// Animation loop
 	function animate() {
 		requestAnimationFrame(animate);
+		
+		// Carica texture man mano che si muove nella scena
+		loadVisibleTextures();
 
 		// Animazione iniziale di caricamento
 		if (!isInitialAnimationComplete) {

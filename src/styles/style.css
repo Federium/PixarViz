@@ -1,58 +1,66 @@
 /* PP Mori Font Family */
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-Extralight.otf') format('opentype');
+	src: url('/fonts/PPMori-Extralight.woff2') format('woff2');
 	font-weight: 200;
 	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-ExtralightItalic.otf') format('opentype');
+	src: url('/fonts/PPMori-ExtralightItalic.woff2') format('woff2');
 	font-weight: 200;
 	font-style: italic;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-Regular.otf') format('opentype');
+	src: url('/fonts/PPMori-Regular.woff2') format('woff2');
 	font-weight: 400;
 	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-RegularItalic.otf') format('opentype');
+	src: url('/fonts/PPMori-RegularItalic.woff2') format('woff2');
 	font-weight: 400;
 	font-style: italic;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-Semibold.otf') format('opentype');
+	src: url('/fonts/PPMori-Semibold.woff2') format('woff2');
 	font-weight: 600;
 	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-SemiboldItalic.otf') format('opentype');
+	src: url('/fonts/PPMori-SemiboldItalic.woff2') format('woff2');
 	font-weight: 600;
 	font-style: italic;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-Black.otf') format('opentype');
+	src: url('/fonts/PPMori-Black.woff2') format('woff2');
 	font-weight: 900;
 	font-style: normal;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: 'PP Mori';
-	src: url('/src/assets/Fonts/PPMori-BlackItalic.otf') format('opentype');
+	src: url('/fonts/PPMori-BlackItalic.woff2') format('woff2');
 	font-weight: 900;
 	font-style: italic;
+	font-display: swap;
 }
 
 /* CSS Variables */
