@@ -145,14 +145,14 @@ const processedData = galleryData.map((item, index) => {
 
 	// Array per le etichette della timeline
 	const timelineLabels: THREE.Mesh[] = [];
-	
+
 	// Placeholder texture (1x1 pixel grigio chiaro)
-	const placeholderCanvas = document.createElement('canvas');
+	const placeholderCanvas = document.createElement("canvas");
 	placeholderCanvas.width = 1;
 	placeholderCanvas.height = 1;
-	const ctx = placeholderCanvas.getContext('2d');
+	const ctx = placeholderCanvas.getContext("2d");
 	if (ctx) {
-		ctx.fillStyle = '#e0e0e0';
+		ctx.fillStyle = "#e0e0e0";
 		ctx.fillRect(0, 0, 1, 1);
 	}
 	const placeholderTexture = new THREE.CanvasTexture(placeholderCanvas);
@@ -231,8 +231,8 @@ const processedData = galleryData.map((item, index) => {
 				const geometry = new THREE.PlaneGeometry(2, 1.5);
 
 				// Usa placeholder inizialmente
-				const material = new THREE.MeshBasicMaterial({ 
-					map: placeholderTexture.clone()
+				const material = new THREE.MeshBasicMaterial({
+					map: placeholderTexture.clone(),
 				});
 				const mesh = new THREE.Mesh(geometry, material);
 
@@ -345,21 +345,21 @@ const processedData = galleryData.map((item, index) => {
 		}
 	} // Carica le immagini
 	loadImages();
-	
+
 	// Lazy loading delle texture
 	// Carica solo le texture che sono vicine alla posizione della camera
 	function loadVisibleTextures() {
 		const cameraZ = camera.position.z;
 		const loadRange = 15; // Carica texture entro questo range dalla camera
-		
+
 		imageData.forEach(data => {
 			if (!data.textureLoaded && data.isVisible) {
 				const distance = Math.abs(data.mesh.position.z - cameraZ);
-				
+
 				// Carica se è nel range o se sta per diventare visibile
 				if (distance < loadRange) {
 					data.textureLoaded = true;
-					
+
 					textureLoader.load(
 						data.textureSrc,
 						// onLoad callback
@@ -368,7 +368,7 @@ const processedData = galleryData.map((item, index) => {
 							loadedTexture.minFilter = THREE.LinearFilter;
 							loadedTexture.magFilter = THREE.LinearFilter;
 							loadedTexture.generateMipmaps = false;
-							
+
 							// Sostituisci il placeholder con la texture reale
 							const material = data.mesh.material as THREE.MeshBasicMaterial;
 							if (material.map) {
@@ -381,7 +381,9 @@ const processedData = galleryData.map((item, index) => {
 						undefined,
 						// onError callback
 						error => {
-							console.error(`❌ Errore caricamento texture: ${data.textureSrc}`);
+							console.error(
+								`❌ Errore caricamento texture: ${data.textureSrc}`
+							);
 							data.textureLoaded = false; // Riprova
 						}
 					);
@@ -389,7 +391,7 @@ const processedData = galleryData.map((item, index) => {
 			}
 		});
 	}
-	
+
 	// Carica le prime texture immediatamente
 	loadVisibleTextures();
 
@@ -702,7 +704,7 @@ const processedData = galleryData.map((item, index) => {
 	// Animation loop
 	function animate() {
 		requestAnimationFrame(animate);
-		
+
 		// Carica texture man mano che si muove nella scena
 		loadVisibleTextures();
 
