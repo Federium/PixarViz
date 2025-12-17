@@ -173,8 +173,7 @@ const musicFiles = [
 		<button id="play-pause-btn" class="control-btn play-pause" aria-label="Play"
 			>▶</button
 		>
-		<button id="next-btn" class="control-btn" aria-label="Next track"
-			>▶|</button
+		<button id="next-btn" class="control-btn" aria-label="Next track">▶|</button
 		>
 	</div>
 
@@ -195,7 +194,7 @@ const musicFiles = [
 		right: 0;
 		width: 100vw;
 		display: grid;
-		grid-template-columns: 300px 1fr 300px;
+		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
 		padding: 1rem 1rem;
 		z-index: 1000;
@@ -218,8 +217,6 @@ const musicFiles = [
 	.track-name-container {
 		flex: 1;
 		overflow: hidden;
-		position: relative;
-		white-space: nowrap;
 	}
 
 	.track-name-text {
@@ -228,27 +225,9 @@ const musicFiles = [
 		font-weight: var(--font-weight-semibold);
 		color: var(--color-text-primary);
 		user-select: none;
-		display: inline-block;
 		white-space: nowrap;
-	}
-
-	.track-name-container.scrolling .track-name-text {
-		animation: scroll-text linear infinite;
-	}
-
-	@keyframes scroll-text {
-		0% {
-			transform: translateX(0);
-		}
-		50% {
-			transform: translateX(-100%);
-		}
-		50.01% {
-			transform: translateX(100%);
-		}
-		100% {
-			transform: translateX(0);
-		}
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.music-indicator {
@@ -558,25 +537,6 @@ const musicFiles = [
 	window.addEventListener("beforeunload", savePlayerState);
 	setInterval(savePlayerState, 1000); // Salva ogni secondo
 
-	// Funzione per controllare se il testo va in overflow e attivare lo scroll
-	function checkTextOverflow() {
-		if (!trackName || !trackNameContainer) return;
-
-		const containerWidth = (trackNameContainer as HTMLElement).offsetWidth;
-		const textWidth = (trackName as HTMLElement).offsetWidth;
-
-		if (textWidth > containerWidth) {
-			// Testo troppo lungo - attiva lo scroll
-			trackNameContainer.classList.add("scrolling");
-			// Calcola la durata basata sulla lunghezza del testo
-			const duration = textWidth / 50; // ~50px al secondo
-			trackName.style.animationDuration = `${duration}s`;
-		} else {
-			// Testo si adatta - disattiva lo scroll
-			trackNameContainer.classList.remove("scrolling");
-		}
-	}
-
 	// Carica la traccia corrente
 	function loadTrack(index: number, restoreTime: boolean = false) {
 		if (index < 0 || index >= musicFiles.length) return;
@@ -599,9 +559,6 @@ const musicFiles = [
 				{ once: true }
 			);
 		}
-
-		// Controlla overflow dopo un breve delay per permettere al DOM di aggiornarsi
-		setTimeout(checkTextOverflow, 100);
 	}
 
 	// Aggiorna l'icona del volume
