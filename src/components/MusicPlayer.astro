@@ -8,12 +8,6 @@ const musicFiles = [
 		src: "/Music/Randy Newman (Toy Story) - You Got A Friend In Me.mp3",
 	},
 	{
-		name: "You've Got a Friend in Me",
-		artist: "Randy Newman",
-		film: "Toy Story",
-		src: "/Music/Randy Newman - You've Got a Friend in Me (From Toy Story).mp3",
-	},
-	{
 		name: "If I Didn't Have You",
 		artist: "Billy Crystal & John Goodman",
 		film: "Monsters Inc.",
@@ -156,14 +150,14 @@ const musicFiles = [
 
 <div id="music-player">
 	<div class="player-left">
-		<div class="track-name-container">
-			<span id="track-name" class="track-name-text">—</span>
-		</div>
 		<span id="music-indicator" class="music-indicator">
 			<span class="bar"></span>
 			<span class="bar"></span>
 			<span class="bar"></span>
 		</span>
+		<div class="track-name-container">
+			<span id="track-name" class="track-name-text">—</span>
+		</div>
 	</div>
 
 	<div class="player-center">
@@ -235,32 +229,39 @@ const musicFiles = [
 		align-items: flex-end;
 		gap: 2px;
 		height: 12px;
-		opacity: 0;
-		transition: opacity 0.3s ease;
-	}
-
-	.music-indicator.playing {
-		opacity: 1;
+		flex-shrink: 0;
 	}
 
 	.music-indicator .bar {
 		width: 2px;
 		background-color: var(--color-text-primary);
+	}
+
+	.music-indicator.playing .bar {
 		animation: wave 0.8s ease-in-out infinite;
 	}
 
 	.music-indicator .bar:nth-child(1) {
 		height: 4px;
+	}
+
+	.music-indicator.playing .bar:nth-child(1) {
 		animation-delay: 0s;
 	}
 
 	.music-indicator .bar:nth-child(2) {
 		height: 8px;
+	}
+
+	.music-indicator.playing .bar:nth-child(2) {
 		animation-delay: 0.2s;
 	}
 
 	.music-indicator .bar:nth-child(3) {
 		height: 6px;
+	}
+
+	.music-indicator.playing .bar:nth-child(3) {
 		animation-delay: 0.4s;
 	}
 
@@ -346,12 +347,6 @@ const musicFiles = [
 			artist: "Randy Newman",
 			film: "Toy Story",
 			src: "/Music/Randy Newman (Toy Story) - You Got A Friend In Me.mp3",
-		},
-		{
-			name: "You've Got a Friend in Me",
-			artist: "Randy Newman",
-			film: "Toy Story",
-			src: "/Music/Randy Newman - You've Got a Friend in Me (From Toy Story).mp3",
 		},
 		{
 			name: "If I Didn't Have You",
